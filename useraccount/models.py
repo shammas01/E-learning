@@ -78,5 +78,4 @@ class UserProfile(models.Model):
     first_name = models.CharField(max_length=30,null=True)
     last_name = models.CharField(max_length=30,null=True)
     address = models.TextField(null=True)
-    
 

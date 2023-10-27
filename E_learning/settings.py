@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import django
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -41,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'User',
+    'useraccount',
+    
 ]
 
 
@@ -137,15 +139,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #New..........................................
 
-AUTH_USER_MODEL = "User.User"
+AUTH_USER_MODEL = "useraccount.User"
 
 
 #smtp configration >........
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_PASSWORD = os.getenv('EMAILHOSTPASSWORD')
+EMAIL_USER = os.getenv('EMAIL_USER')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.getenv('EMAIL')
 EMAIL_USE_TLS = True
 
 
