@@ -43,8 +43,8 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-    USERNAME_FIELD = "username"
-    # REQUIRED_FIELDS = ["username"]
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
 
     def __str__(self):
         if self.username is not None:
@@ -70,3 +70,13 @@ class User(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
     
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name='userprofile')
+    phone = models.CharField(max_length=20, unique=True, null=True)
+    first_name = models.CharField(max_length=30,null=True)
+    last_name = models.CharField(max_length=30,null=True)
+    address = models.TextField(null=True)
+    
+
