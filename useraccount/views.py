@@ -17,9 +17,9 @@ class EmailGetView(APIView):
             otp = math.floor((random.randint(100000,999999)))
             subject = 'Otp for account verification'
             message = f'Your otp for account verification {otp}'
-            email_from = settings.EMAIL_USER
+            # email_from = settings.EMAIL_HOST_USER
             recipient_list = [email]
-            send_email(subject, message, email_from, recipient_list)
+            send_email(subject=subject, message=message, email=recipient_list[0])
             request.session['email'] = email
             request.session['otp'] = otp
             return Response({"email":email},status=status.HTTP_200_OK)
