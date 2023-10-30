@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from . models import User,UserProfile
-from . serializers import Emailsmtpserializer,EmailOtpSerializer,UserProfileSerializer
+from . serializers import Emailsmtpserializer,EmailOtpSerializer,UserProfileSerializer,GoogleSocialAuthSerializer
 import math,random
 from django.conf import settings
 from useraccount.authentication.smtp import send_email
@@ -60,8 +60,10 @@ class UserProfileView(APIView):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
 
-    def delete(self,request):
-        data = UserProfile.objects.get(user = request.user)
-        data.delete()
-        response = {"messege":"your profile deleted"}
-        return Response(response,status=status.HTTP_200_OK)
+class GoogleSocialAuthView(APIView):
+    
+    def post(self,request):
+        serializer = GoogleSocialAuthSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = ((serializer.validated_data)['auth_token'])
+        return Response(data,status=status.HTTP_200_OK)
