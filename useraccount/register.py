@@ -1,5 +1,5 @@
 from . models import User
-import views
+from useraccount import views
 
 def register_social_user(user_id,email,name):
 
