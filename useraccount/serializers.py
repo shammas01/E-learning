@@ -10,9 +10,14 @@ from rest_framework.exceptions import AuthenticationFailed
 class Emailsmtpserializer(serializers.Serializer):
     email = serializers.EmailField()
 
-class EmailOtpSerializer(serializers.Serializer):
+class OtpSerializer(serializers.Serializer):
     otp = serializers.IntegerField()
 
+class GoogleSocialAuthSerializer(serializers.Serializer):
+    auth_token = serializers.CharField()
+
+class PhoneOtpSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
 
 class MyTokenSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -52,8 +57,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-class GoogleSocialAuthSerializer(serializers.Serializer):
-    auth_token = serializers.CharField()
+
     
     
     def validate_auth_token(self,auth_token):
@@ -76,7 +80,8 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         return register_social_user(
             user_id=user_id,email=email,name=name,
         )
-    
+
+
 
 
 # google retuned data from when we pass auth token.    
@@ -95,3 +100,7 @@ user_data=  {
             'locale': 'en-GB',
             'iat': 1698670090, 'exp': 1698673690
             }
+
+
+class PhoneOtp(serializers.Serializer):
+    phone_otp = serializers.CharField()

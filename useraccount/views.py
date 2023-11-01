@@ -1,13 +1,22 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from . models import User,UserProfile
-from . serializers import Emailsmtpserializer,EmailOtpSerializer,UserProfileSerializer,GoogleSocialAuthSerializer
+from . serializers import (
+    Emailsmtpserializer,
+    OtpSerializer,
+    UserProfileSerializer,
+    GoogleSocialAuthSerializer,
+    PhoneOtpSerializer
+    )
 import math,random
 from django.conf import settings
 from useraccount.authentication.smtp import send_email
 from useraccount.authentication.jwt import get_tokens_for_user
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import ( IsAuthenticated, )
+from rest_framework.decorators import permission_classes
+from useraccount.authentication.twilio import send_phone_sms,phone_otp_verify
 # Create your views here.
 
 class EmailOtpSendView(APIView):
@@ -27,10 +36,9 @@ class EmailOtpSendView(APIView):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 
-
 class EmailOtpVerifyView(APIView):
     def post(self,requset):
-        serializer = EmailOtpSerializer(data=requset.data)
+        serializer = OtpSerializer(data=requset.data)
         if serializer.is_valid():
             otp= serializer.validated_data.get('otp')
             email = requset.session.get('email')
@@ -41,15 +49,13 @@ class EmailOtpVerifyView(APIView):
                 response = {"token":token,"messege":"your account successfull activated"}
                 return Response(response,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        
 
-
+@permission_classes([IsAuthenticated])        
 class UserProfileView(APIView):
     def get(self,request):
         user = UserProfile.objects.get(user=request.user)# we can create with 'get_or_create()' method. 
         serializer = UserProfileSerializer(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
-
 
     def put(self,request):
         user = request.user.userprofile
@@ -59,7 +65,6 @@ class UserProfileView(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
-
 class GoogleSocialAuthView(APIView):
     
     def post(self,request):
@@ -67,3 +72,47 @@ class GoogleSocialAuthView(APIView):
         serializer.is_valid(raise_exception=True)
         data = ((serializer.validated_data)['auth_token'])
         return Response(data,status=status.HTTP_200_OK)
+
+class VerifyMobileNumber(APIView):
+    def post(self, request):
+        serializer = PhoneOtpSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            phone = serializer.validated_data.get('phone_number')
+            request.session['phone_number'] = phone
+            print(phone)
+            try:
+                verification_sid = send_phone_sms(phone)
+                print(verification_sid)
+                request.session['verification_sid'] = verification_sid
+                return Response({"sid":verification_sid},status=status.HTTP_201_CREATED)
+            except Exception as e:
+                print(e)
+            return Response({'msg':'somthing wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes([IsAuthenticated])
+class PhoneOtpVerificationView(APIView):
+    def post(self, request):
+        serializer = OtpSerializer(data=request.data)  
+        if serializer.is_valid():
+            otp = serializer.validated_data.get('otp')
+            verification_sid = request.session.get('verification_sid')
+            try:
+                verification_check = phone_otp_verify(verification_sid, otp)
+                print(verification_check.status) 
+            except:
+                return Response({'msg':'Something Went Wrong...'})
+            if verification_check.status == 'approved':
+                entered_phone_number=request.session.get('phone_number')
+                user_profile = UserProfile.objects.get(user=request.user)
+                user_profile.phone = entered_phone_number
+                user_profile.save()
+                response_data = {
+                    "msg":"Success",
+                }                                               
+                return Response(response_data)
+            return Response({'msg': 'Something Went Wrong...'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+

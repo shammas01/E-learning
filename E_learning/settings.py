@@ -211,3 +211,12 @@ SIMPLE_JWT = {
 # google social autehetication credenials....
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 CLIENT_SECRET=os.getenv('CLIENT_SECRET')
+
+
+# twillio configration............
+
+
+
+ACCOUNT_SID = os.getenv('ACCOUNT_SID')
+AUTH_TOKEN = os.getenv('AUTH_TOKEN')
+SERVICE_SID = os.getenv('SERVICE_SID')
