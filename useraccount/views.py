@@ -58,21 +58,52 @@ class UserProfileView(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
 
     def put(self,request):
-        user = request.user.userprofile
-        serializer=UserProfileSerializer(user,data=request.data,partial=True)
-        if serializer.is_valid():   
+        user_profile = request.user.userprofile
+        serializer=UserProfileSerializer(user_profile,data=request.data,partial=True)
+        email = request.data.get('user', {}).get('email')
+        print(request.data)
+        print(email)
+        user_email = request.user.email
+        print(user_email)
+        if serializer.is_valid():
+            if email and email != user_email:
+                otp = math.floor((random.randint(100000,999999)))
+                subject = 'Otp for account verification'
+                message = f'Your otp for account verification {otp}'
+                recipient_list = [email]
+                send_email(subject=subject, message=message, email=recipient_list[0])
+                request.session['email'] = email
+                request.session['otp'] = otp
+                
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        
-class GoogleSocialAuthView(APIView):
+
+@permission_classes([IsAuthenticated])
+class EmailUpdatdOtpView(APIView):
+    def post(self, request):
+        serialize =  OtpSerializer(data=request.data)
+        if serialize.is_valid():
+            otp = serialize.validated_data.get('otp')
+            saved_otp = request.session.get('otp')
+            email =  request.session.get('email')
+            if otp == saved_otp:
+                user = request.user
+                user.email = email
+                user.save()
+                return Response("Email update successfully")
+            else:
+                return Response({"messege":"Invalid otp"})
+        return Response(serialize.error_messages,status=status.HTTP_400_BAD_REQUEST)
     
+class GoogleSocialAuthView(APIView):
     def post(self,request):
         serializer = GoogleSocialAuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = ((serializer.validated_data)['auth_token'])
         return Response(data,status=status.HTTP_200_OK)
 
+@permission_classes([IsAuthenticated])
 class VerifyMobileNumber(APIView):
     def post(self, request):
         serializer = PhoneOtpSerializer(data=request.data)

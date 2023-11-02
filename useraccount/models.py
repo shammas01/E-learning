@@ -83,3 +83,6 @@ class UserProfile(models.Model):
     last_name = models.CharField(max_length=30,null=True)
     address = models.TextField(null=True)
 
+    def __str__(self):
+        return str(self.user_id)
+    
