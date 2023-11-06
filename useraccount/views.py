@@ -140,7 +140,7 @@ class PhoneOtpVerificationView(APIView):
                 user_profile.phone = entered_phone_number
                 user_profile.save()
                 response_data = {
-                    "msg":"Success",
+                    "msg":"your phone number is verifyed",
                 }                                               
                 return Response(response_data)
             return Response({'msg': 'Something Went Wrong...'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)

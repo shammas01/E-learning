@@ -6,16 +6,20 @@ class TutorModel(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='tutor_files/profile/', null=True, blank=True)
     approved = models.BooleanField(default=False)
-    skills = models.ManyToManyField('Skill', related_name='tutors')
+    skills = models.ManyToManyField('SkillModel', related_name='tutors',null=True,blank=True)
     resume = models.FileField(upload_to='tutor_files/resume/', null=True, blank=True)
+    phone = models.CharField(max_length=13, unique=True,null=True)
 
+    
     def __str__(self):
-        return self.user.username
+        return str(self.user)
+    
 
 
-class Skill(models.Model):
+
+class SkillModel(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
