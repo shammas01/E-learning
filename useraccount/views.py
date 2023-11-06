@@ -62,7 +62,6 @@ class UserProfileView(APIView):
         serializer=UserProfileSerializer(user_profile,data=request.data,partial=True)
         email = request.data.get('user', {}).get('email')
         print(request.data)
-        print(email)
         user_email = request.user.email
         print(user_email)
         if serializer.is_valid():
@@ -96,12 +95,14 @@ class EmailUpdatdOtpView(APIView):
                 return Response({"messege":"Invalid otp"})
         return Response(serialize.error_messages,status=status.HTTP_400_BAD_REQUEST)
     
+
 class GoogleSocialAuthView(APIView):
     def post(self,request):
         serializer = GoogleSocialAuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = ((serializer.validated_data)['auth_token'])
         return Response(data,status=status.HTTP_200_OK)
+
 
 @permission_classes([IsAuthenticated])
 class VerifyMobileNumber(APIView):

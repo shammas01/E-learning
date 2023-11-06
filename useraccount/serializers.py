@@ -19,6 +19,10 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
 class PhoneOtpSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
 
+
+# class PhoneOtp(serializers.Serializer):
+#     phone_otp = serializers.CharField()
+
 class MyTokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user,*args):
@@ -102,5 +106,4 @@ user_data=  {
             }
 
 
-class PhoneOtp(serializers.Serializer):
-    phone_otp = serializers.CharField()
+
