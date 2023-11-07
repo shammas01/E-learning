@@ -10,18 +10,44 @@ from rest_framework.exceptions import AuthenticationFailed
 class Emailsmtpserializer(serializers.Serializer):
     email = serializers.EmailField()
 
+
 class OtpSerializer(serializers.Serializer):
     otp = serializers.IntegerField()
 
-class GoogleSocialAuthSerializer(serializers.Serializer):
-    auth_token = serializers.CharField()
 
 class PhoneOtpSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
 
 
-# class PhoneOtp(serializers.Serializer):
-#     phone_otp = serializers.CharField()
+class GoogleSocialAuthSerializer(serializers.Serializer):
+    auth_token = serializers.CharField()
+
+    def validate_auth_token(self, auth_token):
+        user_data = google.Google.validate(auth_token)
+        try:
+            user_data["sub"]
+            print(user_data)
+        except:
+            raise serializers.ValidationError(
+                "The token is expired or invalid. Please login again."
+            )
+        if user_data["aud"] != settings.GOOGLE_CLIENT_ID:
+            raise AuthenticationFailed("oops, who are you?")
+
+        user_id = user_data["sub"]
+        email = user_data["email"]
+        name = user_data["name"]
+
+        return register_social_user(
+            user_id=user_id,
+            email=email,
+            name=name,
+        )
+
+
+
+
+
 
 class MyTokenSerializer(TokenObtainPairSerializer):
     @classmethod

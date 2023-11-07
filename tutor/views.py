@@ -6,7 +6,6 @@ from . models import SkillModel,TutorModel
 from . serializers import TutorSerializer,TutorUpdateSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import permission_classes
 from useraccount.authentication.smtp import send_email_for_tutor
 from useraccount.authentication.twilio import send_phone_sms,phone_otp_verify
 from useraccount.serializers import OtpSerializer,PhoneOtpSerializer
@@ -29,6 +28,7 @@ class TutorRrgistrationView(APIView):
                     user = request.user,
                     profile_picture=serializer.validated_data.get('profile_picture'),
                     resume=serializer.validated_data.get('resume'),
+                    phone=serializer.validated_data.get('phone')
                     
                 )
                 tutor.save()
@@ -60,27 +60,23 @@ class TutorRrgistrationView(APIView):
         tutor_profile = request.user.tutormodel
         print(tutor_profile)
         serializer = TutorUpdateSerializer(tutor_profile,data=request.data,partial=True)
+        old_phone = tutor_profile.phone
+        print(old_phone)
         if serializer.is_valid():
+            phone = serializer.validated_data.get('phone')
+            print(phone)    
+            request.session['phone'] = phone
+            if phone and phone != old_phone:
+                try:
+                    verification_sid = send_phone_sms(phone)
+                    request.session['sid'] = verification_sid
+                    serializer.save()
+                    return Response({"messege":"otp send success fully","sid":verification_sid})
+                except Exception as e:
+                    print(e)
+                
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
-
-class TutorPhoneVerification(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self,request):
-        serializer = PhoneOtpSerializer(data=request.data)
-        if serializer.is_valid():
-            phone = serializer.validated_data.get('phone_number')
-            request.session['phone'] = phone
-            try:
-                verification_sid = send_phone_sms(phone)
-                request.session['sid'] = verification_sid
-                return Response({"sid":verification_sid},status=status.HTTP_201_CREATED)
-            except Exception as e:
-                print(e)
-            return Response({"messege":"somting was wrong with your phone verification"})
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -109,3 +105,6 @@ class PhoneOtpVerifyView(APIView):
                 return Response(response_data)
             return Response({'msg': 'Something Went Wrong...'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+
+

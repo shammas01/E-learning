@@ -17,9 +17,12 @@ from rest_framework import status
 from rest_framework.permissions import ( IsAuthenticated, )
 from rest_framework.decorators import permission_classes
 from useraccount.authentication.twilio import send_phone_sms,phone_otp_verify
+from drf_spectacular.utils import extend_schema
 # Create your views here.
 
 class EmailOtpSendView(APIView):
+    serializer_class=Emailsmtpserializer
+    @extend_schema(responses=Emailsmtpserializer)
     def post(self,request):
         serializer = Emailsmtpserializer(data=request.data)
         if serializer.is_valid():
@@ -37,6 +40,8 @@ class EmailOtpSendView(APIView):
     
 
 class EmailOtpVerifyView(APIView):
+    serializer_class=OtpSerializer
+    @extend_schema(responses=OtpSerializer)
     def post(self,requset):
         serializer = OtpSerializer(data=requset.data)
         if serializer.is_valid():
@@ -50,8 +55,13 @@ class EmailOtpVerifyView(APIView):
                 return Response(response,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
 @permission_classes([IsAuthenticated])        
 class UserProfileView(APIView):
+
+    serializer_class=UserProfileSerializer
+    @extend_schema(responses=UserProfileSerializer)
+
     def get(self,request):
         user = UserProfile.objects.get(user=request.user)# we can create with 'get_or_create()' method. 
         serializer = UserProfileSerializer(user)
@@ -78,8 +88,13 @@ class UserProfileView(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
 @permission_classes([IsAuthenticated])
 class EmailUpdatdOtpView(APIView):
+
+    serializer_class=OtpSerializer
+    @extend_schema(responses=OtpSerializer)
+
     def post(self, request):
         serialize =  OtpSerializer(data=request.data)
         if serialize.is_valid():
@@ -96,16 +111,22 @@ class EmailUpdatdOtpView(APIView):
         return Response(serialize.error_messages,status=status.HTTP_400_BAD_REQUEST)
     
 
+
 class GoogleSocialAuthView(APIView):
+    serializer_class=GoogleSocialAuthSerializer
+    @extend_schema(responses=GoogleSocialAuthSerializer)
     def post(self,request):
         serializer = GoogleSocialAuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = ((serializer.validated_data)['auth_token'])
+        data = ((serializer.validated_data)['auth_token'])       
         return Response(data,status=status.HTTP_200_OK)
+
 
 
 @permission_classes([IsAuthenticated])
 class VerifyMobileNumber(APIView):
+    serializer_class=PhoneOtpSerializer
+    @extend_schema(responses=PhoneOtpSerializer)
     def post(self, request):
         serializer = PhoneOtpSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -125,6 +146,8 @@ class VerifyMobileNumber(APIView):
 
 @permission_classes([IsAuthenticated])
 class PhoneOtpVerificationView(APIView):
+    serializer_class=OtpSerializer
+    @extend_schema(responses=OtpSerializer)
     def post(self, request):
         serializer = OtpSerializer(data=request.data)  
         if serializer.is_valid():
