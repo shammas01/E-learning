@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tutor', '0003_tutormodel_phone'),
+        ("tutor", "0003_tutormodel_phone"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tutormodel',
-            name='is_block',
+            model_name="tutormodel",
+            name="is_block",
             field=models.BooleanField(default=False),
         ),
     ]

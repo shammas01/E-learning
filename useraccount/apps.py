@@ -2,8 +2,8 @@ from django.apps import AppConfig
 
 
 class UseraccountConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'useraccount'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "useraccount"
 
     def ready(self) -> None:
         import useraccount.authentication.signals

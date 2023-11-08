@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,21 +14,58 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='SkillModel',
+            name="SkillModel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='TutorModel',
+            name="TutorModel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('profile_picture', models.ImageField(blank=True, null=True, upload_to='tutor_files/profile/')),
-                ('approved', models.BooleanField(default=False)),
-                ('resume', models.FileField(blank=True, null=True, upload_to='tutor_files/resume/')),
-                ('skills', models.ManyToManyField(related_name='tutors', to='tutor.skillmodel')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "profile_picture",
+                    models.ImageField(
+                        blank=True, null=True, upload_to="tutor_files/profile/"
+                    ),
+                ),
+                ("approved", models.BooleanField(default=False)),
+                (
+                    "resume",
+                    models.FileField(
+                        blank=True, null=True, upload_to="tutor_files/resume/"
+                    ),
+                ),
+                (
+                    "skills",
+                    models.ManyToManyField(
+                        related_name="tutors", to="tutor.skillmodel"
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]
