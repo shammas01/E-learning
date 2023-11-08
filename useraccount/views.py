@@ -61,12 +61,14 @@ class UserProfileView(APIView):
 
     serializer_class=UserProfileSerializer
     @extend_schema(responses=UserProfileSerializer)
-
     def get(self,request):
         user = UserProfile.objects.get(user=request.user)# we can create with 'get_or_create()' method. 
         serializer = UserProfileSerializer(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+
+    serializer_class=UserProfileSerializer
+    @extend_schema(responses=UserProfileSerializer)
     def put(self,request):
         user_profile = request.user.userprofile
         serializer=UserProfileSerializer(user_profile,data=request.data,partial=True)
@@ -94,7 +96,6 @@ class EmailUpdatdOtpView(APIView):
 
     serializer_class=OtpSerializer
     @extend_schema(responses=OtpSerializer)
-
     def post(self, request):
         serialize =  OtpSerializer(data=request.data)
         if serialize.is_valid():

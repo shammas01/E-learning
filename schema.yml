@@ -1,0 +1,412 @@
+openapi: 3.0.3
+info:
+  title: E-lerning App
+  version: 0.0.0
+paths:
+  /emailsend/:
+    post:
+      operationId: emailsend_create
+      tags:
+      - emailsend
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Emailsmtpserializer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Emailsmtpserializer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Emailsmtpserializer'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Emailsmtpserializer'
+          description: ''
+  /emailupdate/:
+    post:
+      operationId: emailupdate_create
+      tags:
+      - emailupdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Otp'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Otp'
+          description: ''
+  /googleaut/:
+    post:
+      operationId: googleaut_create
+      tags:
+      - googleaut
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleSocialAuth'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GoogleSocialAuth'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GoogleSocialAuth'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoogleSocialAuth'
+          description: ''
+  /otpverification/:
+    post:
+      operationId: otpverification_create
+      tags:
+      - otpverification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Otp'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Otp'
+          description: ''
+  /phoneotpverify/:
+    post:
+      operationId: phoneotpverify_create
+      tags:
+      - phoneotpverify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Otp'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Otp'
+          description: ''
+  /phoneverify/:
+    post:
+      operationId: phoneverify_create
+      tags:
+      - phoneverify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneOtp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhoneOtp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhoneOtp'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneOtp'
+          description: ''
+  /tutor/otpverify/:
+    post:
+      operationId: tutor_otpverify_create
+      tags:
+      - tutor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Otp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Otp'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Otp'
+          description: ''
+  /tutor/register/:
+    get:
+      operationId: tutor_register_retrieve
+      tags:
+      - tutor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tutor'
+          description: ''
+    post:
+      operationId: tutor_register_create
+      tags:
+      - tutor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TutorUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TutorUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TutorUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tutor'
+          description: ''
+    put:
+      operationId: tutor_register_update
+      tags:
+      - tutor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TutorUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TutorUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TutorUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TutorUpdate'
+          description: ''
+  /userprofile/:
+    get:
+      operationId: userprofile_retrieve
+      tags:
+      - userprofile
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    put:
+      operationId: userprofile_update
+      tags:
+      - userprofile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+components:
+  schemas:
+    Emailsmtpserializer:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    GoogleSocialAuth:
+      type: object
+      properties:
+        auth_token:
+          type: string
+      required:
+      - auth_token
+    MyUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          nullable: true
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 255
+      required:
+      - email
+      - id
+    Otp:
+      type: object
+      properties:
+        otp:
+          type: integer
+      required:
+      - otp
+    PhoneOtp:
+      type: object
+      properties:
+        phone_number:
+          type: string
+      required:
+      - phone_number
+    Tutor:
+      type: object
+      properties:
+        user:
+          type: integer
+        profile_picture:
+          type: string
+          format: uri
+          nullable: true
+        skills:
+          type: array
+          items:
+            type: integer
+            nullable: true
+        resume:
+          type: string
+          format: uri
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+          maxLength: 13
+      required:
+      - user
+    TutorUpdate:
+      type: object
+      properties:
+        user:
+          type: integer
+        profile_picture:
+          type: string
+          format: uri
+          nullable: true
+        resume:
+          type: string
+          format: uri
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+          maxLength: 13
+      required:
+      - user
+    UserProfile:
+      type: object
+      properties:
+        phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 30
+        last_name:
+          type: string
+          nullable: true
+          maxLength: 30
+        address:
+          type: string
+          nullable: true
+        user:
+          $ref: '#/components/schemas/MyUser'
+      required:
+      - user
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

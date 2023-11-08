@@ -9,13 +9,15 @@ from rest_framework.permissions import IsAuthenticated
 from useraccount.authentication.smtp import send_email_for_tutor
 from useraccount.authentication.twilio import send_phone_sms,phone_otp_verify
 from useraccount.serializers import OtpSerializer,PhoneOtpSerializer
+from drf_spectacular.utils import extend_schema
 
 # Create your views here.
 
 
 class TutorRrgistrationView(APIView):
     permission_classes = [IsAuthenticated]
-
+    serializer_class=TutorSerializer
+    @extend_schema(responses=TutorSerializer)
     def post(self, request):
         serializer = TutorSerializer(data=request.data)
         try:
@@ -45,6 +47,8 @@ class TutorRrgistrationView(APIView):
         return Response({"msg": "Wrong", "errors": serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
 
+    serializer_class=TutorSerializer
+    @extend_schema(responses=TutorSerializer)
     def get(self, request):
         user = TutorModel.objects.get(user=request.user)
         if user.is_block is False:
@@ -56,6 +60,8 @@ class TutorRrgistrationView(APIView):
         return Response({"messege":"you are blocked. contact with admin"})
     
 
+    serializer_class=TutorUpdateSerializer
+    @extend_schema(responses=TutorUpdateSerializer)
     def put(self, request):
         tutor_profile = request.user.tutormodel
         print(tutor_profile)
@@ -83,6 +89,8 @@ class TutorRrgistrationView(APIView):
 
 class PhoneOtpVerifyView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class=OtpSerializer
+    @extend_schema(responses=OtpSerializer)
     def post(self, request):
         serializer = OtpSerializer(data=request.data)
         if serializer.is_valid():

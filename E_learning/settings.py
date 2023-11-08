@@ -169,10 +169,25 @@ REST_FRAMEWORK = {
   
 }
 
-SPECTACULAR_SETTINGS = {'TITLE':'E-lerning App',}
+
+SPECTACULAR_SETTINGS = {
+        'TITLE':'E-lerning App',
+        "SERVE_INCLUDE_SCHEMA":False,
+        "SECURITY_DEFINITIONS":{
+            "Bearer Token": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
+
+            }
+        },
+    }
+
+
+
+
 
 from datetime import timedelta
-
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
@@ -220,9 +235,6 @@ CLIENT_SECRET=os.getenv('CLIENT_SECRET')
 
 
 # twillio configration............
-
-
-
 ACCOUNT_SID = os.getenv('ACCOUNT_SID')
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 SERVICE_SID = os.getenv('SERVICE_SID')
