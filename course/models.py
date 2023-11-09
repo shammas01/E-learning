@@ -4,10 +4,12 @@ from tutor.models import TutorModel
 from useraccount.models import User
 
 # Create your models here.
+
+# Category of course.....
 class CategoryModel(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='category_images/', blank=True, null=True)
+    image = models.ImageField(upload_to='course/course_file/category_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -15,7 +17,8 @@ class CategoryModel(models.Model):
         return self.name
 
 
-class CourseDetails(models.Model):
+# Details of course.......
+class CourseDetailsModel(models.Model):
     turor = models.ForeignKey(TutorModel,on_delete=models.CASCADE,null=True,blank=True)
     heading = models.CharField(max_length=255)
     contents = models.TextField()
@@ -29,20 +32,22 @@ class CourseDetails(models.Model):
         return self.heading
 
 
-class CourseContent(models.Model):
-    course_id = models.ForeignKey(CourseDetails,on_delete=models.CASCADE)
+# Content of course.......
+class CourseContentModel(models.Model):
+    course_id = models.ForeignKey(CourseDetailsModel,on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    document = models.FileField(upload_to='course_file/documents/',null=True,blank=True)
-    video = models.FileField(upload_to='course_file/video/',null=True,blank=True)
+    document = models.FileField(upload_to='course/course_file/documents/',null=True,blank=True)
+    video = models.FileField(upload_to='course/course_file/videos/',null=True,blank=True)
     order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.course_id.heading
     
 
-class CourseRating(models.Model):
-    course = models.ForeignKey(CourseDetails,on_delete=models.CASCADE)
+# ratings of couerce
+class CourseRatingModel(models.Model):
+    course = models.ForeignKey(CourseDetailsModel,on_delete=models.CASCADE)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     rating = models.FloatField()
     user_review = models.TextField()
@@ -54,8 +59,8 @@ class CourseRating(models.Model):
 
 
 
-
-class LiveClassDetails(models.Model):
+# Details of live class
+class LiveClassDetailsModel(models.Model):
     SESSION_TYPES = [
         ('One-to-Many', 'One-To-Many'),
         ('One-on-One', 'One-on-One'),
@@ -77,6 +82,7 @@ class LiveClassDetails(models.Model):
     title = models.CharField(max_length=255)  # Title of the live session
     description = models.TextField()  # Detailed description of the session
     category = models.ForeignKey(CategoryModel, on_delete=models.CASCADE,blank=True,null=True)  # Reference to the subject or category
+    duration = models.FloatField()
     session_type = models.CharField(max_length=12, choices=SESSION_TYPES)  # Session type
     class_start_datetime = models.DateTimeField()  # Scheduled start date and time
     class_duration = models.PositiveIntegerField(null=True,blank=True)  # Duration of the session (in minutes)
@@ -92,15 +98,15 @@ class LiveClassDetails(models.Model):
         return self.title
     
 
-
-class LiveClassContents(models.Model):
+# Contents of live class
+class LiveClassContentsModel(models.Model):
     live_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    live_session = models.ForeignKey(LiveClassDetails, on_delete=models.CASCADE)
+    live_session = models.ForeignKey(LiveClassDetailsModel, on_delete=models.CASCADE)
     recording_url = models.URLField(max_length=200, blank=True, null=True)
     materials_resources = models.TextField(blank=True, null=True)
     session_url = models.URLField(max_length=200, blank=True, null=True)
     cancellation_policy = models.TextField(blank=True, null=True)
-    session_images = models.ImageField(upload_to='live_class_images/', blank=True, null=True)
+    session_images = models.ImageField(upload_to='course/course_file/live_images/', blank=True, null=True)
 
     def __str__(self):
         return f"LiveClassContent ID: {self.live_id} for Live Session: {self.live_session.id}"
