@@ -6,26 +6,28 @@ from . models import (
             CourseRatingModel,
             LiveClassContentsModel,
             LiveClassDetailsModel)
-from . serializers import CourseDetailsSerializer
+from . serializers import CourseDetailsSerializer,CourseContentSerializer,CourseDetailsListCreateSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from tutor.models import TutorModel
 from rest_framework import status
+from rest_framework import viewsets
+# custom permissions....
+from . permissions import IsTutorOrReadOnly
 # Create your views here.
 
 
-class CreateCourseView(APIView):
-    permission_classes = [IsAuthenticated]
-
+class ListCreateCourseView(APIView):
+    permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
     def get(self, request):
-        data = CourseDetailsModel.objects.get(tutor=request.user.tutormodel)    
-        serializer= CourseDetailsSerializer(data)
+        data = CourseDetailsModel.objects.filter(tutor=request.user.tutormodel)
+        serializer= CourseDetailsListCreateSerializer(data,many=True)
         return Response(serializer.data)
 
 
     def post(self, request):
-        serializer = CourseDetailsSerializer(data=request.data)
+        serializer = CourseDetailsListCreateSerializer(data=request.data)
         
         try:
             tutor = TutorModel.objects.get(user=request.user)
@@ -51,10 +53,36 @@ class CreateCourseView(APIView):
         return Response({"messege":"somthing wrong!!.. contact admin"})
 
 
-    def put(self, request):
-        course_details = CourseDetailsModel.objects.get(tutor=request.user.tutormodel)   
-        serializer = CourseDetailsSerializer(course_details,request.data,partial=True)
+
+class RetriveUpdateDistroyView(APIView):
+    permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
+    
+    def get_object(self, pk):
+        try:
+            return CourseDetailsModel.objects.get(id=pk, tutor=self.request.user.tutormodel)
+        except CourseDetailsModel.DoesNotExist:
+            raise Http404
+        
+
+    def get(self, request, pk):
+        course = self.get_object(pk)
+        serializer = CourseDetailsSerializer(course)
+        return Response(serializer.data)
+    
+
+    def put(self, request, pk):
+        course = self.get_object(pk)
+        serializer = CourseDetailsSerializer(course, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'messge':"updated successfully","data":serializer.data})
-        return Response(serializer.errors)
+            return Response({"messege":"your data updated","data":serializer.data},status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def delete(self, request, pk):
+        course = self.get_object(pk)
+        course.delete()
+        return Response({"messege":"your course removed"},status=status.HTTP_204_NO_CONTENT)
+
+
+

@@ -54,10 +54,10 @@ class TutorListCreateView(APIView):
     serializer_class = TutorSerializer
     @extend_schema(responses=TutorSerializer)
     def get(self, request):
-        user = TutorModel.objects.get(user=request.user)
-        if user.is_block is False:
-            if user.approved is True:
-                serializer = TutorSerializer(user)
+        tutor = TutorModel.objects.get(user=request.user)
+        if tutor.is_block is False:
+            if tutor.approved is True:
+                serializer = TutorSerializer(tutor)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(
@@ -71,15 +71,12 @@ class TutorUpdateView(APIView):
     @extend_schema(responses=TutorUpdateSerializer)
     def put(self, request):
         tutor_profile = request.user.tutormodel
-        print(tutor_profile)
         serializer = TutorUpdateSerializer(
             tutor_profile, data=request.data, partial=True
         )
         old_phone = tutor_profile.phone
-        print(old_phone)
         if serializer.is_valid():
             phone = serializer.validated_data.get("phone")
-            print(phone)
             request.session["phone"] = phone
             if phone and phone != old_phone:
                 try:

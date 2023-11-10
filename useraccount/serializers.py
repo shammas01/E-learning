@@ -86,6 +86,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
     def validate_auth_token(self, auth_token):
         user_data = google.Google.validate(auth_token)
         print("user data= ", user_data)

@@ -14,9 +14,7 @@ class TutorUpdateSerializer(serializers.ModelSerializer):
         fields = ("user", "profile_picture", "resume", "phone")
 
     def update(self, instance, validated_data):
-        instance.profile_picture = validated_data.get(
-            "profile_picture", instance.profile_picture
-        )
+        instance.profile_picture = validated_data.get("profile_picture", instance.profile_picture)
         instance.resume = validated_data.get("resume", instance.resume)
 
         instance.save()
