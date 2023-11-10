@@ -19,8 +19,8 @@ class CategoryModel(models.Model):
 
 # Details of course.......
 class CourseDetailsModel(models.Model):
-    turor = models.ForeignKey(TutorModel,on_delete=models.CASCADE,null=True,blank=True)
-    heading = models.CharField(max_length=255)
+    tutor = models.ForeignKey(TutorModel,on_delete=models.CASCADE,null=True,blank=True)
+    heading = models.CharField(max_length=255,unique=True)
     contents = models.TextField()
     description  = models.TextField()
     duration = models.FloatField()
@@ -34,15 +34,15 @@ class CourseDetailsModel(models.Model):
 
 # Content of course.......
 class CourseContentModel(models.Model):
-    course_id = models.ForeignKey(CourseDetailsModel,on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
+    course_id = models.ForeignKey(CourseDetailsModel,on_delete=models.CASCADE,related_name='course_content')
+    title = models.CharField(max_length=255,null=True,blank=True)
     description = models.TextField(blank=True, null=True)
     document = models.FileField(upload_to='course/course_file/documents/',null=True,blank=True)
     video = models.FileField(upload_to='course/course_file/videos/',null=True,blank=True)
     order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.course_id.heading
+        return str(self.course_id)
     
 
 # ratings of couerce

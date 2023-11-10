@@ -14,7 +14,7 @@ from drf_spectacular.utils import extend_schema
 # Create your views here.
 
 
-class TutorRrgistrationView(APIView):
+class TutorListCreateView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TutorSerializer
 
@@ -52,7 +52,6 @@ class TutorRrgistrationView(APIView):
         )
 
     serializer_class = TutorSerializer
-
     @extend_schema(responses=TutorSerializer)
     def get(self, request):
         user = TutorModel.objects.get(user=request.user)
@@ -66,8 +65,9 @@ class TutorRrgistrationView(APIView):
                 )
         return Response({"messege": "you are blocked. contact with admin"})
 
+    
+class TutorUpdateView(APIView):
     serializer_class = TutorUpdateSerializer
-
     @extend_schema(responses=TutorUpdateSerializer)
     def put(self, request):
         tutor_profile = request.user.tutormodel
@@ -95,6 +95,7 @@ class TutorRrgistrationView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class PhoneOtpVerifyView(APIView):

@@ -15,6 +15,7 @@ def register_social_user(user_id, email, name):
             "username": name,
             "email": email,
         }
+        
         try:
             user = User.objects.create_user(**user)
             user.save()
