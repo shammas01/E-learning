@@ -1,7 +1,7 @@
 from django.contrib import admin
 from . models import (
             CategoryModel,
-            CourseContentModel,
+            CourseLessonModel,
             CourseDetailsModel,
             CourseRatingModel,
             LiveClassContentsModel,
@@ -10,7 +10,7 @@ from . models import (
 
 admin.site.register(CategoryModel)
 admin.site.register(CourseDetailsModel)
-admin.site.register(CourseContentModel)
+admin.site.register(CourseLessonModel)
 admin.site.register(CourseRatingModel)
 admin.site.register(LiveClassDetailsModel)
 admin.site.register(LiveClassContentsModel)

@@ -1,12 +1,12 @@
 from django.http import Http404
 from . models import (
             CategoryModel,
-            CourseContentModel,
+            CourseLessonModel,
             CourseDetailsModel,
             CourseRatingModel,
             LiveClassContentsModel,
             LiveClassDetailsModel)
-from . serializers import CourseDetailsSerializer,CourseContentSerializer,CourseDetailsListCreateSerializer,ContentPostSerializer
+from . serializers import CourseDetailsSerializer,ContentListCreateSerializer,CourseDetailsListCreateSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -93,8 +93,8 @@ class ListCreateCourseContentView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
     
     def get(self, request,course_id):
-        data = CourseContentModel.objects.filter(course_id=course_id)
-        serializerv = CourseContentSerializer(data,many=True)
+        data = CourseLessonModel.objects.filter(course_id=course_id)
+        serializerv = ContentListCreateSerializer(data,many=True)
         return Response(serializerv.data)
     
 
@@ -109,15 +109,15 @@ class ListCreateCourseContentView(APIView):
             course = CourseDetailsModel.objects.get(tutor=tutor,id=course_id)
             print(course)
         except CourseDetailsModel.DoesNotExist:
-            raise Http404("Course not found.")
+            raise Http404({"message":"Course not found."}, status=status.HTTP_404_NOT_FOUND)
 
         
         if tutor.approved is True and not tutor.is_block:
-            serializer = ContentPostSerializer(data=request.data)
+            serializer = ContentListCreateSerializer(data=request.data)
             print(serializer)
             if serializer.is_valid():
                 print(serializer.data)
-                CourseContentModel.objects.create(
+                CourseLessonModel.objects.create(
                     course_id = course,
                     title = serializer.validated_data.get('title'),
                     description = serializer.validated_data.get('description'),

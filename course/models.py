@@ -33,9 +33,9 @@ class CourseDetailsModel(models.Model):
 
 
 # Content of course.......
-class CourseContentModel(models.Model):
+class CourseLessonModel(models.Model):
     course_id = models.ForeignKey(CourseDetailsModel,on_delete=models.CASCADE,related_name='course_content')
-    title = models.CharField(max_length=255,null=True,blank=True,unique=True)
+    title = models.CharField(max_length=255,null=True,blank=True)
     description = models.TextField(blank=True, null=True)
     document = models.FileField(upload_to='course/course_file/documents/',null=True,blank=True)
     video = models.FileField(upload_to='course/course_file/videos/',null=True,blank=True)
@@ -44,6 +44,18 @@ class CourseContentModel(models.Model):
     def __str__(self):
         return str(self.course_id)
     
+
+
+# class CourseContentsModel(models.Model):
+#     lesson_id = models.ForeignKey(CourseLessonModel,on_delete=models.CASCADE)
+#     name = models.CharField(max_length=255)
+#     description = models.TextField(blank=True,null=True)
+#     document = models.FileField(upload_to='course/course_file/documents/',null=True,blank=True)
+#     video = models.FileField(upload_to='course/course_file/videos/',null=True,blank=True)
+#     order = models.PositiveIntegerField(default=1)
+
+
+
 
 # ratings of couerce
 class CourseRatingModel(models.Model):
