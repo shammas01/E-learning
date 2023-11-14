@@ -6,7 +6,7 @@ from . models import (
             CourseRatingModel,
             LiveClassContentsModel,
             LiveClassDetailsModel)
-from . serializers import CourseDetailsSerializer,CourseContentSerializer,CourseDetailsListCreateSerializer
+from . serializers import CourseDetailsSerializer,CourseContentSerializer,CourseDetailsListCreateSerializer,ContentPostSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -18,7 +18,9 @@ from . permissions import IsTutorOrReadOnly
 # Create your views here.
 
 
-class ListCreateCourseView(APIView):
+
+
+class ListCreateCourseDetailsView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
     def get(self, request):
         data = CourseDetailsModel.objects.filter(tutor=request.user.tutormodel)
@@ -54,7 +56,7 @@ class ListCreateCourseView(APIView):
 
 
 
-class RetriveUpdateDistroyView(APIView):
+class RetriveUpdateCourseDetailsView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
     
     def get_object(self, pk):
@@ -85,4 +87,46 @@ class RetriveUpdateDistroyView(APIView):
         return Response({"messege":"your course removed"},status=status.HTTP_204_NO_CONTENT)
 
 
+
+
+class ListCreateCourseContentView(APIView):
+    permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
+    
+    def get(self, request,course_id):
+        data = CourseContentModel.objects.filter(course_id=course_id)
+        serializerv = CourseContentSerializer(data,many=True)
+        return Response(serializerv.data)
+    
+
+    def post(self,request,course_id):
+        try:
+            tutor = TutorModel.objects.get(user=request.user)
+            print(tutor)
+        except TutorModel.DoesNotExist:
+           return Response({"message": "Tutor not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            course = CourseDetailsModel.objects.get(tutor=tutor,id=course_id)
+            print(course)
+        except CourseDetailsModel.DoesNotExist:
+            raise Http404("Course not found.")
+
+        
+        if tutor.approved is True and not tutor.is_block:
+            serializer = ContentPostSerializer(data=request.data)
+            print(serializer)
+            if serializer.is_valid():
+                print(serializer.data)
+                CourseContentModel.objects.create(
+                    course_id = course,
+                    title = serializer.validated_data.get('title'),
+                    description = serializer.validated_data.get('description'),
+                    document = serializer.validated_data.get('document'),
+                    video = serializer.validated_data.get('video'),
+                    order = serializer.validated_data.get('order')
+                )
+                
+                return Response({"messege":"your content succssesfully added","data":serializer.data})
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response("somthing wrong...!!!")
 

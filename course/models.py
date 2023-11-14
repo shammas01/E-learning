@@ -35,7 +35,7 @@ class CourseDetailsModel(models.Model):
 # Content of course.......
 class CourseContentModel(models.Model):
     course_id = models.ForeignKey(CourseDetailsModel,on_delete=models.CASCADE,related_name='course_content')
-    title = models.CharField(max_length=255,null=True,blank=True)
+    title = models.CharField(max_length=255,null=True,blank=True,unique=True)
     description = models.TextField(blank=True, null=True)
     document = models.FileField(upload_to='course/course_file/documents/',null=True,blank=True)
     video = models.FileField(upload_to='course/course_file/videos/',null=True,blank=True)

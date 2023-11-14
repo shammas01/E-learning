@@ -18,19 +18,26 @@ class CourseDetailsListCreateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class CourseDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseDetailsModel
+        exclude = ('tutor',)
+
+
 
 class CourseContentSerializer(serializers.ModelSerializer):
+    # course_id = CourseDetailsSerializer()
     class Meta:
         model = CourseContentModel
         fields = '__all__'
 
 
-
-class CourseDetailsSerializer(serializers.ModelSerializer):
-
+class ContentPostSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CourseDetailsModel
-        exclude = ('tutor',)
+        model = CourseContentModel
+        exclude = ('course_id',)
+
+
 
 
 
