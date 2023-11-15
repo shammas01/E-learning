@@ -6,13 +6,17 @@ from . models import (
             CourseRatingModel,
             LiveClassContentsModel,
             LiveClassDetailsModel)
-from . serializers import CourseDetailsSerializer,ContentListCreateSerializer,CourseDetailsListCreateSerializer
+from . serializers import (
+            CourseDetailsSerializer,
+            ContentListCreateSerializer,
+            CourseDetailsListCreateSerializer,
+            LessonUpdateSerializer)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from tutor.models import TutorModel
 from rest_framework import status
-from rest_framework import viewsets
+from drf_spectacular.utils import extend_schema
 # custom permissions....
 from . permissions import IsTutorOrReadOnly
 # Create your views here.
@@ -22,12 +26,16 @@ from . permissions import IsTutorOrReadOnly
 
 class ListCreateCourseDetailsView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
+    serializer_class = CourseDetailsListCreateSerializer
+
+    @extend_schema(responses=CourseDetailsListCreateSerializer)
     def get(self, request):
         data = CourseDetailsModel.objects.filter(tutor=request.user.tutormodel)
         serializer= CourseDetailsListCreateSerializer(data,many=True)
         return Response(serializer.data)
 
-
+    serializer_class = CourseDetailsListCreateSerializer
+    @extend_schema(responses=CourseDetailsListCreateSerializer)
     def post(self, request):
         serializer = CourseDetailsListCreateSerializer(data=request.data)
         
@@ -59,6 +67,8 @@ class ListCreateCourseDetailsView(APIView):
 class RetriveUpdateCourseDetailsView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
     
+
+    @extend_schema(responses=CourseDetailsSerializer)
     def get_object(self, pk):
         try:
             return CourseDetailsModel.objects.get(id=pk, tutor=self.request.user.tutormodel)
@@ -66,12 +76,16 @@ class RetriveUpdateCourseDetailsView(APIView):
             raise Http404
         
 
+    serializer_class = CourseDetailsSerializer
+    @extend_schema(responses=CourseDetailsSerializer)
     def get(self, request, pk):
         course = self.get_object(pk)
         serializer = CourseDetailsSerializer(course)
         return Response(serializer.data)
     
 
+    serializer_class = CourseDetailsSerializer
+    @extend_schema(responses=CourseDetailsSerializer)
     def put(self, request, pk):
         course = self.get_object(pk)
         serializer = CourseDetailsSerializer(course, data=request.data)
@@ -80,7 +94,8 @@ class RetriveUpdateCourseDetailsView(APIView):
             return Response({"messege":"your data updated","data":serializer.data},status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
+    
+    @extend_schema(responses=CourseDetailsSerializer)
     def delete(self, request, pk):
         course = self.get_object(pk)
         course.delete()
@@ -89,15 +104,18 @@ class RetriveUpdateCourseDetailsView(APIView):
 
 
 
-class ListCreateCourseContentView(APIView):
+class ListCreateCourseLessontView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
-    
+
+    serializer_class = ContentListCreateSerializer
+    @extend_schema(responses=ContentListCreateSerializer)
     def get(self, request,course_id):
         data = CourseLessonModel.objects.filter(course_id=course_id)
         serializerv = ContentListCreateSerializer(data,many=True)
         return Response(serializerv.data)
     
-
+    serializer_class = ContentListCreateSerializer
+    @extend_schema(responses=ContentListCreateSerializer)
     def post(self,request,course_id):
         try:
             tutor = TutorModel.objects.get(user=request.user)
@@ -130,3 +148,40 @@ class ListCreateCourseContentView(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response("somthing wrong...!!!")
 
+
+
+class LessonUpdateView(APIView):
+    permission_classes=[IsTutorOrReadOnly,IsAuthenticated]
+
+    
+    @extend_schema(responses=LessonUpdateSerializer)
+    def get_object(self, pk):
+        try:
+            return CourseLessonModel.objects.get(id=pk)    
+        except CourseLessonModel.DoesNotExist:
+            return Response("lesson dose not exist")
+        
+
+    serializer_class = ContentListCreateSerializer
+    @extend_schema(responses=LessonUpdateSerializer)
+    def get(self, request, pk):
+        lesson = self.get_object(pk)
+        serializer = LessonUpdateSerializer(lesson)
+        return Response(serializer.data)
+    
+
+    serializer_class = ContentListCreateSerializer
+    @extend_schema(responses=LessonUpdateSerializer)
+    def put(self, request, pk):
+        lesson = self.get_object(pk)
+        serializer = LessonUpdateSerializer(lesson, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"successfully updated","data":serializer.data})
+        return Response(serializer.errors)
+    
+    @extend_schema(responses=LessonUpdateSerializer)
+    def delete(self , request, pk):
+        lesson = self.get_object(pk)
+        lesson.delete()
+        return Response({"message":"data will deleted"},status=status.HTTP_404_NOT_FOUND)

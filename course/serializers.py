@@ -39,5 +39,9 @@ class ContentListCreateSerializer(serializers.ModelSerializer):
 
 
 
+class LessonUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseLessonModel
+        exclude = ('course_id',)
 
 

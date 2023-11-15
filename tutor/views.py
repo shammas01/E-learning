@@ -10,6 +10,7 @@ from useraccount.authentication.smtp import send_email_for_tutor
 from useraccount.authentication.twilio import send_phone_sms, phone_otp_verify
 from useraccount.serializers import OtpSerializer, PhoneOtpSerializer
 from drf_spectacular.utils import extend_schema
+from . permissions import IsTutorOrReadOnly
 
 # Create your views here.
 
@@ -67,6 +68,7 @@ class TutorListCreateView(APIView):
 
     
 class TutorUpdateView(APIView):
+    permission_classes = [IsAuthenticated,]
     serializer_class = TutorUpdateSerializer
     @extend_schema(responses=TutorUpdateSerializer)
     def put(self, request):
@@ -93,7 +95,13 @@ class TutorUpdateView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+    serializer_class = TutorUpdateSerializer
+    @extend_schema(responses=TutorUpdateSerializer)
+    def delete(self, request):
+        tutor_profile = request.user.tutormodel
+        print(tutor_profile)
+        tutor_profile.delete()
+        return Response({"message":"tutor was successfull deleted"},status=status.HTTP_404_NOT_FOUND)
 
 class PhoneOtpVerifyView(APIView):
     permission_classes = [IsAuthenticated]
@@ -125,3 +133,5 @@ class PhoneOtpVerifyView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
