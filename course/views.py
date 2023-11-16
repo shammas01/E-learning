@@ -4,8 +4,7 @@ from . models import (
             CourseLessonModel,
             CourseDetailsModel,
             CourseRatingModel,
-            LiveClassContentsModel,
-            LiveClassDetailsModel)
+            )
 from . serializers import (
             CourseDetailsSerializer,
             ContentListCreateSerializer,

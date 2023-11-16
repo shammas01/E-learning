@@ -23,6 +23,11 @@ urlpatterns = [
     path("", include("useraccount.urls")),
     path("tutor/", include("tutor.urls")),
     path("course/", include("course.urls")),
+    path("live/",include("live.urls")),
+
+
+
+    # for swagger documatetion
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path("elearning/check/", SpectacularSwaggerView.as_view(url_name="schema")),
 ]

@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import django
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -45,6 +44,8 @@ INSTALLED_APPS = [
     "useraccount",
     "tutor",
     "course",
+    "live",
+
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
