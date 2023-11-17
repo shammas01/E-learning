@@ -33,6 +33,7 @@ class ListCreateCourseDetailsView(APIView):
         serializer= CourseDetailsListCreateSerializer(data,many=True)
         return Response(serializer.data)
 
+
     serializer_class = CourseDetailsListCreateSerializer
     @extend_schema(responses=CourseDetailsListCreateSerializer)
     def post(self, request):
