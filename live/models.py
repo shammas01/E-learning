@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.db import models
 import uuid
 from course.models import CategoryModel
@@ -34,16 +35,21 @@ class LiveClassDetailsModel(models.Model):
     description = models.TextField(null=True,blank=True)  
     category = models.ForeignKey(CategoryModel, on_delete=models.CASCADE,blank=True,null=True)  
     day_duration = models.IntegerField()
-    session_type = models.CharField(max_length=12, choices=SESSION_TYPES,default='One-to-Many')  
+    session_type = models.CharField(max_length=12, default='One-to-Many',choices=SESSION_TYPES,null=True)  
     class_start_datetime = models.DateTimeField()  
     class_duration = models.PositiveIntegerField(null=True,blank=True)  
     max_slots = models.PositiveIntegerField()  
     available_slots = models.PositiveIntegerField(null=True,blank=True)  
     pricing = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True) 
-    session_status = models.CharField(max_length=12, choices=SESSION_STATUSES, default="Planned")  
+    session_status = models.CharField(max_length=12, default="Planned",choices=SESSION_STATUSES,null=True)  
     created_datetime = models.DateTimeField(auto_now_add=True)  
     last_updated_datetime = models.DateTimeField(auto_now=True)  
     
+
+    def save(self, *args, **kwargs):
+        self.last_updated_datetime = models.DateField(auto_now_add=True)
+        super(LiveClassDetailsModel, self).save(*args, **kwargs)
+
 
     def __str__(self):
         return self.title
@@ -68,3 +74,5 @@ class LiveClassContentsModel(models.Model):
 
     def __str__(self):
         return f"LiveClassContent ID: {self.live_id} for Live Session: {self.live_session.id}"
+    
+    

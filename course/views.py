@@ -64,6 +64,7 @@ class ListCreateCourseDetailsView(APIView):
 
 
 
+
 class RetriveUpdateCourseDetailsView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
     

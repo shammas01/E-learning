@@ -45,18 +45,6 @@ class CourseLessonModel(models.Model):
         return str(self.course_id)
     
 
-
-# class CourseContentsModel(models.Model):
-#     lesson_id = models.ForeignKey(CourseLessonModel,on_delete=models.CASCADE)
-#     name = models.CharField(max_length=255)
-#     description = models.TextField(blank=True,null=True)
-#     document = models.FileField(upload_to='course/course_file/documents/',null=True,blank=True)
-#     video = models.FileField(upload_to='course/course_file/videos/',null=True,blank=True)
-#     order = models.PositiveIntegerField(default=1)
-
-
-
-
 # ratings of couerce
 class CourseRatingModel(models.Model):
     course = models.ForeignKey(CourseDetailsModel,on_delete=models.CASCADE)
