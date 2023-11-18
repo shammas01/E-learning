@@ -35,7 +35,6 @@ class LiveDetailListCreateView(APIView):
                     max_slots = serializer.validated_data.get('max_slots'),
                     available_slots = serializer.validated_data.get('max_slots'),
                     pricing = serializer.validated_data.get('pricing'),
-                    session_status = serializer.validated_data.get('session_status'),
                     created_datetime = serializer.validated_data.get('created_datetime'),
                     last_updated_datetime = serializer.validated_data.get('last_updated_datetime')
                 )
@@ -61,6 +60,8 @@ class LiveDetailUpdateView(APIView):
         
     def get(self, request, pk):
         data = self.get_object(pk)
+        st=data.session_status
+        print("#############",st)
         serializer = liveDetailUpdateSerializer(data)
         return Response(serializer.data)
     
@@ -68,29 +69,15 @@ class LiveDetailUpdateView(APIView):
     def put(self, request, pk):
         live_details = self.get_object(pk)
         statuss =live_details.session_status
-        print(statuss)
+        print(">>>>>>>>>>>>>>>>",statuss)
         serializer = liveDetailUpdateSerializer(live_details,data=request.data,partial=True)
+        session = LiveClassDetailsModel.objects.get(teacher=request.user.tutormodel)
         if serializer.is_valid():
-            if live_details.session_status == 'Planned':
-                LiveClassDetailsModel.objects.update(
-                    title = serializer.validated_data.get('title'),
-                    description = serializer.validated_data.get('description'),
-                    category = serializer.validated_data.get('category'),
-                    day_duration = serializer.validated_data.get('day_duration'),
-                    session_type = serializer.validated_data.get('session_type'),
-                    class_start_datetime = serializer.validated_data.get('class_start_datetime'),
-                    class_duration = serializer.validated_data.get('class_duration'),
-                    max_slots = serializer.validated_data.get('max_slots'),
-                    available_slots = serializer.validated_data.get('max_slots'),
-                    pricing = serializer.validated_data.get('pricing'),
-                    session_status = serializer.validated_data.get('session_status'),
-                )
-            else:
-                teacher = request.user.tutormodel
-                print(teacher)
-
+            
+            if session.session_status and session.session_status != 'Planned':
+                return Response("Cannot update once session status is Published", status=status.HTTP_403_FORBIDDEN)
+            serializer.save()
                 
-                response = {"message":"successfully updated","data":serializer.data}
-                return Response(response,status=status.HTTP_200_OK)
-            return Response("update befor publishing")
+            response = {"message":"successfully updated","data":serializer.data}
+            return Response(response,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
