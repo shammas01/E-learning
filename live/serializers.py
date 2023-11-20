@@ -44,18 +44,18 @@ class liveDetailUpdateSerializer(serializers.ModelSerializer):
         
     def update(self, instance, validated_data):
         print(validated_data)
-             
+
+        instance.max_slots = validated_data.get("max_slots", instance.max_slots)
+        instance.available_slots = validated_data.get("max_slots", instance.max_slots)
+            
         if 'session_status' in validated_data and validated_data['session_status'] == 'Published':
-
             print("oklasjdfljasdlfkjals;dkfjalskdflaskdfj")
-            subject = "confirm message for this live session"
-            message = """congragulation your live session has been activated
+            subject = f"Confirmation message for {instance.title} live session"
+            message = f"Congratulations! Your live session {instance.title} has been activated.\n\n"
+            message += f"If you wish to update your live session before publishing, you can do so.\n\n"
+            message += f"Your published date is: {instance.last_updated_datetime}"
 
-                # if you want to update your live session befor publishing.
-
-                """
             teacher = instance.teacher
             print(teacher)
             send_email_live_confierm(subject=subject,message=message,email=teacher)
-            print(send_email_live_confierm)
-            return super().update(instance, validated_data)
+        return super().update(instance, validated_data)

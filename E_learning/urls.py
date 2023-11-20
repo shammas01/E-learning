@@ -24,6 +24,7 @@ urlpatterns = [
     path("tutor/", include("tutor.urls")),
     path("course/", include("course.urls")),
     path("live/",include("live.urls")),
+    path("user/",include("userdashboad.urls")),
 
 
 

@@ -6,6 +6,7 @@ from useraccount.models import User
 
 class TutorModel(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200,null=True,blank=True)
     profile_picture = models.ImageField(
         upload_to="tutor_files/profile/", null=True, blank=True
     )

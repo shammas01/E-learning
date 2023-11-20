@@ -73,11 +73,19 @@ class LiveDetailUpdateView(APIView):
         serializer = liveDetailUpdateSerializer(live_details,data=request.data,partial=True)
         session = LiveClassDetailsModel.objects.get(teacher=request.user.tutormodel)
         if serializer.is_valid():
-            
+
             if session.session_status and session.session_status != 'Planned':
                 return Response("Cannot update once session status is Published", status=status.HTTP_403_FORBIDDEN)
+            
             serializer.save()
-                
             response = {"message":"successfully updated","data":serializer.data}
             return Response(response,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def delete(self, requset, pk):
+        live_details = self.get_object(pk)
+        live_details.delete()
+        return Response("Deleted your live session",status=status.HTTP_404_NOT_FOUND)
+    
+
