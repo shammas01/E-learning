@@ -21,12 +21,13 @@ class CourceListForUser(APIView):
 
 
 class CourseSearching(APIView):
-    permission_classes = AllowAny
+    permission_classes = [AllowAny]
     def get(self, reqeust):
         q = reqeust.GET.get("q")
-        Q_base = Q(heading__icontains=q) | Q(tutor__icontains=q)
+        Q_base = Q(heading__icontains=q) | Q(tutor__name__icontains=q)
         if not q:
             pass
         course = CourseDetailsModel.objects.filter(Q_base)
         serializer = CourseListserializer(course, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    

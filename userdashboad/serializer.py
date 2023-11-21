@@ -13,4 +13,4 @@ class CourseListserializer(serializers.ModelSerializer):
     tutor = TutorListserializer()
     class Meta:
         model = CourseDetailsModel
-        exclude = ('rating')
+        exclude = ('rating',)

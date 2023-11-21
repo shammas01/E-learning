@@ -30,18 +30,21 @@ class TutorListCreateView(APIView):
             if serializer.is_valid(raise_exception=True):
                 tutor = TutorModel(
                     user=request.user,
+                    name=serializer.validated_data.get('name'),
                     profile_picture=serializer.validated_data.get("profile_picture"),
                     resume=serializer.validated_data.get("resume"),
-                    phone=serializer.validated_data.get("phone"),
+                    phone=serializer.validated_data.get("phone"), 
                 )
                 tutor.save()
-                subject = "Registration For Tutor"
-                messege = "Congragulation your application has been saved. We will contact you"
-                send_email_for_tutor(subject=subject, message=messege, email=tutor.user)
 
-                skills = serializer.validated_data.get("skills")
-                tutor.skills.set(skills)
+                # subject = "Registration For Tutor"
+                # messege = "Congragulation your application has been saved. We will contact you"
+                # send_email_for_tutor(subject=subject, message=messege, email=tutor.user)
 
+                skills = serializer.validated_data.get("skills"),
+                [tutor.skills.set(i) for i in skills]
+                
+            
                 response = {
                     "messege": "your registration prosses are commpleted",
                     "data": serializer.data,
