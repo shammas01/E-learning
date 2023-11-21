@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
+    "debug_toolbar",
 ]
 
 
@@ -61,7 +62,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
+
+
 
 ROOT_URLCONF = "E_learning.urls"
 
@@ -222,3 +226,18 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 ACCOUNT_SID = os.getenv("ACCOUNT_SID")
 AUTH_TOKEN = os.getenv("AUTH_TOKEN")
 SERVICE_SID = os.getenv("SERVICE_SID")
+
+
+# time settings............
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+LANGUAGE_CODE = "en-us"
+
+TIME_ZONE = "UTC"
+
+USE_I18N = True
+
+USE_TZ = True

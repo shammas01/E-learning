@@ -24,10 +24,10 @@ class CourseSearching(APIView):
     permission_classes = [AllowAny]
     def get(self, reqeust):
         q = reqeust.GET.get("q")
-        Q_base = Q(heading__icontains=q) | Q(tutor__name__icontains=q)
-        if not q:
-            pass
-        course = CourseDetailsModel.objects.filter(Q_base)
+        Q_base = Q()
+        if q:
+            Q_base = Q(heading__icontains=q) | Q(tutor__name__icontains=q)            
+        course = CourseDetailsModel.objects.filter(Q_base).select_related('tutor').prefetch_related("tutor__skills")
         serializer = CourseListserializer(course, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
