@@ -37,9 +37,9 @@ class TutorListCreateView(APIView):
                 )
                 tutor.save()
 
-                # subject = "Registration For Tutor"
-                # messege = "Congragulation your application has been saved. We will contact you"
-                # send_email_for_tutor(subject=subject, message=messege, email=tutor.user)
+                subject = "Registration For Tutor"
+                messege = "Congragulation your application has been saved. We will contact you"
+                send_email_for_tutor(subject=subject, message=messege, email=tutor.user)
 
                 skills = serializer.validated_data.get("skills"),
                 [tutor.skills.set(i) for i in skills]
