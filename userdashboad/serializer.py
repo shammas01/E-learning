@@ -26,6 +26,7 @@ class CourseListserializer(serializers.ModelSerializer):
 
 
 
+
 class TutorSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = TutorModel
@@ -36,4 +37,11 @@ class TutorSelectSerializer(serializers.ModelSerializer):
 class CourseSelectSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseDetailsModel
-        fields = ('tutor','contents','description','duration','rating','language')
+        fields = ('tutor','heading','contents','description','duration','rating','language')
+
+
+
+class LiveSelectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =  LiveClassDetailsModel
+        fields = ('teacher','title','day_duration','session_type','pricing')

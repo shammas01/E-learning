@@ -5,12 +5,17 @@ from rest_framework.permissions import AllowAny
 from django.db.models import Q , Prefetch
 from course.models import CourseDetailsModel
 from live.models import LiveClassDetailsModel
-from . serializer import TutorListserializer,CourseListserializer,TutorSelectSerializer,CourseSelectSerializer
+from . serializer import (TutorListserializer,
+                          CourseListserializer,
+                          TutorSelectSerializer,
+                          CourseSelectSerializer,
+                          LiveSelectSerializer)
 from rest_framework.response import Response
 from rest_framework import status 
 from tutor.models import TutorModel
 from course.models import CourseDetailsModel
 from . paginator import CustomUserListPagination
+from live.models import LiveClassDetailsModel
 
 # Create your views here.
 
@@ -38,7 +43,7 @@ class CourseSearching(APIView):
 
 
 
-class TutorSlection(APIView):
+class Slide_Bar_Slection(APIView):
 
 
     def get(self, request):
@@ -49,7 +54,9 @@ class TutorSlection(APIView):
         if tutor:
             result = self.get_tutor()
         if course:
-            result = self.get_course()
+            result = self.get_course(request)
+        if live:
+            result = self.get_live()
             return Response(result,status=status.HTTP_200_OK)
         return Response(result,status=status.HTTP_400_BAD_REQUEST)
 
@@ -71,15 +78,37 @@ class TutorSlection(APIView):
             return {"somthing wrong with your seralizer"}
     
 
-    def get_course(self):
+    def get_course(self,request):
+        
         try:
             courses = CourseDetailsModel.objects.all()
         except CourseDetailsModel.DoesNotExist:
             raise Http404
         
         if courses:
-            serializer = CourseSelectSerializer(courses, many=True)
-            return serializer.data
-        return {"somting wrong with your serializer"}
+            try:
+                pagination = CustomUserListPagination()
+                page_result = pagination.paginate_queryset(courses, request)
+                serializer = CourseSelectSerializer(page_result, many=True)
+                page_count = pagination.page.paginator.num_pages
+                return {"data": serializer.data, "page_count": page_count}
+            except Exception as e:
+                print(e)
+                return {"somting wrong with your serializer....."}
+        return {"course not found"}
 
         
+    def get_live(self):
+        try:
+            lives = LiveClassDetailsModel.objects.filter(
+                session_status='Published'
+            )
+            
+        except LiveClassDetailsModel.DoesNotExist:
+            raise Http404(" live not found")
+        
+        if lives:
+            serializer = LiveSelectSerializer(lives,many=True)
+            return serializer.data
+        
+        return {"somting wrong with your live serializer"}
