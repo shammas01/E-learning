@@ -21,6 +21,7 @@ from rest_framework.decorators import permission_classes
 from useraccount.authentication.twilio import send_phone_sms, phone_otp_verify
 from drf_spectacular.utils import extend_schema
 
+
 # Create your views here.
 
 
@@ -67,44 +68,6 @@ class EmailOtpVerifyView(APIView):
                 return Response(response, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-@permission_classes([IsAuthenticated])
-class UserProfileView(APIView):
-    serializer_class = UserProfileSerializer
-
-    @extend_schema(responses=UserProfileSerializer)
-    def get(self, request):
-        user = UserProfile.objects.get(
-            user=request.user
-        )  # we can create with 'get_or_create()' method.
-        serializer = UserProfileSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    serializer_class = UserProfileSerializer
-
-    @extend_schema(responses=UserProfileSerializer)
-    def put(self, request):
-        user_profile = request.user.userprofile
-        serializer = UserProfileSerializer(
-            user_profile, data=request.data, partial=True
-        )
-        email = request.data.get("user", {}).get("email")
-        print(request.data)
-        user_email = request.user.email
-        print(user_email)
-        if serializer.is_valid():
-            if email and email != user_email:
-                otp = math.floor((random.randint(100000, 999999)))
-                subject = "Otp for account verification"
-                message = f"Your otp for account verification {otp}"
-                recipient_list = [email]
-                send_email(subject=subject, message=message, email=recipient_list[0])
-                request.session["email"] = email
-                request.session["otp"] = otp
-
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes([IsAuthenticated])

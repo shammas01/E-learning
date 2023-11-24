@@ -87,28 +87,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-    def validate_auth_token(self, auth_token):
-        user_data = google.Google.validate(auth_token)
-        print("user data= ", user_data)
-        try:
-            user_data["sub"]
-            print("user data sub=", user_data["sub"])
-        except:
-            raise serializers.ValidationError(
-                "The token is expired or invalid. Please login again."
-            )
-        if user_data["aud"] != settings.GOOGLE_CLIENT_ID:
-            raise AuthenticationFailed("oops, who are you?")
-
-        user_id = user_data["sub"]
-        email = user_data["email"]
-        name = user_data["name"]
-
-        return register_social_user(
-            user_id=user_id,
-            email=email,
-            name=name,
-        )
+    
 
 
 # google retuned data from when we pass auth token.
