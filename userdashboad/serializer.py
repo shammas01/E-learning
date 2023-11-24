@@ -36,44 +36,79 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-    
-class LiveListSerializer(serializers.ModelSerializer):
+# for searching..............
+class LiveSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = LiveClassDetailsModel
         fields = '__all__'
 
 
-class TutorListserializer(serializers.ModelSerializer):
-    liveclassdetailsmodel_set = LiveListSerializer(many=True)
+class TutorSearchSerializer(serializers.ModelSerializer):
+    liveclassdetailsmodel_set = LiveSearchSerializer(many=True)
     class Meta:
         model = TutorModel
         fields = '__all__'
 
 
-class CourseListserializer(serializers.ModelSerializer):
-    tutor = TutorListserializer()
+class CourseSearchSerializer(serializers.ModelSerializer):
+    tutor = TutorSearchSerializer()
     class Meta:
         model = CourseDetailsModel
-        exclude = ('rating',)
+        exclude = ('catogory',)
 
 
-
-
-class TutorSelectSerializer(serializers.ModelSerializer):
+# listing All........................
+class TutorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = TutorModel
-        fields = ('name','profile_picture','skills','phone')
+        fields = ('id','name','profile_picture','skills','phone')
+
+
+class CourseListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseDetailsModel
+        fields = ('id','tutor','heading','contents','description','duration','rating','language')
+
+
+class LiveListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =  LiveClassDetailsModel
+        fields = ('id','teacher','title','session_type')
+
+
+
+#selecting serializer....................
+class TutorSelectSerializer(serializers.ModelSerializer):
+    coursedetailsmodel_set = CourseListSerializer(many=True)
+    liveclassdetailsmodel_set = LiveListSerializer(many=True)
+    class Meta: 
+        model = TutorModel
+        fields = ('id','name','profile_picture','skills','phone','coursedetailsmodel_set','liveclassdetailsmodel_set')
 
 
 
 class CourseSelectSerializer(serializers.ModelSerializer):
+    tutor = TutorListSerializer()
     class Meta:
         model = CourseDetailsModel
-        fields = ('tutor','heading','contents','description','duration','rating','language')
+        fields = ('id','heading','contents','description','duration','rating','language','tutor')
 
 
 
 class LiveSelectSerializer(serializers.ModelSerializer):
+    teacher = TutorListSerializer()
     class Meta:
-        model =  LiveClassDetailsModel
-        fields = ('teacher','title','day_duration','session_type','pricing')
+        model = LiveClassDetailsModel
+        fields = ('id',
+                  'title',
+                  'description',
+                  'day_duration',
+                  'session_type',
+                  'class_start_datetime',
+                  'class_duration',
+                  'available_slots',
+                  'pricing',
+                  'session_status',
+                  'created_datetime',
+                  'teacher',
+                )

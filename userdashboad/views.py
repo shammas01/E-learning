@@ -6,12 +6,15 @@ from rest_framework.permissions import AllowAny
 from django.db.models import Q , Prefetch
 from course.models import CourseDetailsModel
 from live.models import LiveClassDetailsModel
-from . serializer import (TutorListserializer,
-                          CourseListserializer,
+from . serializer import (
+                          CourseSearchSerializer,
+                          TutorListSerializer,
+                          CourseListSerializer,
+                          LiveListSerializer,
+                          UserProfileSerializer,
                           TutorSelectSerializer,
                           CourseSelectSerializer,
-                          LiveSelectSerializer,
-                          UserProfileSerializer)
+                          LiveSelectSerializer)
 from rest_framework.response import Response
 from rest_framework import status 
 from tutor.models import TutorModel
@@ -68,15 +71,15 @@ class UserProfileView(APIView):
 class CourseSearching(APIView):
     permission_classes = [AllowAny]
 
-    serializer_class = CourseListserializer
-    @extend_schema(responses=CourseListserializer)
+    serializer_class = CourseSearchSerializer
+    @extend_schema(responses=CourseSearchSerializer)
     def get(self, reqeust):
         q = reqeust.GET.get("q")
         Q_base = Q()
         if q:
             Q_base = Q(heading__icontains=q) | Q(tutor__name__icontains=q)
         course = CourseDetailsModel.objects.filter(Q_base).select_related('tutor').prefetch_related("tutor__skills",'tutor__liveclassdetailsmodel_set')
-        serializer = CourseListserializer(course, many=True)
+        serializer = CourseSearchSerializer(course, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
@@ -84,8 +87,8 @@ class CourseSearching(APIView):
 class TutorListing(APIView):
     permission_classes=[AllowAny]
 
-    serializer_class = UserProfileSerializer
-    @extend_schema(responses=UserProfileSerializer)
+    serializer_class = TutorListSerializer
+    @extend_schema(responses=TutorListSerializer)
     def get(self, request):
         try:
             tutors = TutorModel.objects.filter(
@@ -97,21 +100,17 @@ class TutorListing(APIView):
         except TutorModel.DoesNotExist:
             print('data not found')
         try:
-            serialzer = TutorSelectSerializer(tutors,many=True)
+            serialzer = TutorListSerializer(tutors,many=True)
             return Response(serialzer.data)
         except Exception as e:
             return Response({"somthing wrong with your seralizer"})
 
         
-    
-        
-
-
 class CourseListing(APIView):
     permission_classes = [AllowAny]
 
-    sserializer_class = CourseSelectSerializer
-    @extend_schema(responses=CourseSelectSerializer)
+    sserializer_class = CourseListSerializer
+    @extend_schema(responses=CourseListSerializer)
     def get(self, request):
         try:
             courses = CourseDetailsModel.objects.all()
@@ -122,7 +121,7 @@ class CourseListing(APIView):
             try:
                 pagination = CustomUserListPagination()
                 page_result = pagination.paginate_queryset(courses, request)
-                serializer = CourseSelectSerializer(page_result, many=True)
+                serializer = CourseListSerializer(page_result, many=True)
                 page_count = pagination.page.paginator.num_pages
                 return Response({"data": serializer.data, "page_count": page_count})
             except Exception as e:
@@ -131,12 +130,11 @@ class CourseListing(APIView):
         return Response({"course not found"})
         
 
-
 class LiveListing(APIView):
     permission_classes=[AllowAny]
 
-    serializer_class = LiveSelectSerializer
-    @extend_schema(responses=LiveSelectSerializer)
+    serializer_class = LiveListSerializer
+    @extend_schema(responses=LiveListSerializer)
     def get(self,request):
         try:
             lives = LiveClassDetailsModel.objects.filter(
@@ -147,7 +145,56 @@ class LiveListing(APIView):
             raise Http404("live not found")
         
         if lives:
-            serializer = LiveSelectSerializer(lives,many=True)
+            serializer = LiveListSerializer(lives,many=True)
             return Response(serializer.data)
         
         return Response({"somting wrong with your live serializer"})
+    
+
+
+
+# selecting one...............
+class TutorSelect(APIView):
+    permission_classes=[AllowAny]
+
+    serializer_class = TutorSelectSerializer
+    @extend_schema(responses=TutorSelectSerializer)
+    def get(self, request,pk):
+        try:
+            tutor = TutorModel.objects.filter(id=pk).prefetch_related('coursedetailsmodel_set','liveclassdetailsmodel_set')
+        except TutorModel.DoesNotExist:
+            raise Http404('tutor not found')
+        if tutor:
+            serializer = TutorSelectSerializer(tutor,many=True)
+            return Response(serializer.data)
+        return Response('tutor not found')
+    
+
+class CourseSelect(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, pk):
+        try:
+            course = CourseDetailsModel.objects.get(id=pk)
+        except CourseDetailsModel.DoesNotExist:
+            raise Http404("course not found")
+        
+        if course:
+            serializer = CourseSelectSerializer(course)
+            return Response(serializer.data)
+        return Response("not fond")
+    
+
+
+class LiveSelect(APIView):
+    def get(self, request, pk):
+        try:
+            live = LiveClassDetailsModel.objects.get(id=pk)
+            print(live)
+        except LiveClassDetailsModel.DoesNotExist:
+            raise Http404('this live not fond')
+        
+        if live:
+            serializer = LiveSelectSerializer(live)
+            return Response(serializer.data)
+        return Response("live not found")
+
