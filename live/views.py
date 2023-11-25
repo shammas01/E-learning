@@ -1,5 +1,4 @@
 from django.http import Http404
-from django.shortcuts import render
 from rest_framework.views import APIView
 from . serializers import ListLiveSerializer,liveDetailUpdateSerializer
 from tutor.permissions import IsTutorOrReadOnly
@@ -9,11 +8,15 @@ from tutor.models import TutorModel
 from rest_framework.response import Response
 from rest_framework import status
 from live.module.smtp import send_email_live_confierm
+from drf_spectacular.utils import extend_schema
 # Create your views here.
 
 
 class LiveDetailListCreateView(APIView):
     permission_classes = [IsAuthenticated, IsTutorOrReadOnly]
+
+    serializer_class = ListLiveSerializer
+    @extend_schema(responses=ListLiveSerializer)
     def post(self, request):
         serializer = ListLiveSerializer(data=request.data)
         try:
@@ -44,6 +47,8 @@ class LiveDetailListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+    serializer_class = ListLiveSerializer
+    @extend_schema(responses=ListLiveSerializer)
     def get(self, request):
         data = LiveClassDetailsModel.objects.filter(teacher=request.user.tutormodel)
         serializer = ListLiveSerializer(data,many=True)
@@ -57,7 +62,10 @@ class LiveDetailUpdateView(APIView):
             return LiveClassDetailsModel.objects.get(id=pk, teacher=self.request.user.tutormodel)
         except LiveClassDetailsModel.DoesNotExist:
             raise Http404("not found")
-        
+    
+
+    serializer_class = liveDetailUpdateSerializer
+    @extend_schema(responses=liveDetailUpdateSerializer)
     def get(self, request, pk):
         data = self.get_object(pk)
         st=data.session_status
@@ -66,6 +74,8 @@ class LiveDetailUpdateView(APIView):
         return Response(serializer.data)
     
 
+    serializer_class = liveDetailUpdateSerializer
+    @extend_schema(responses=liveDetailUpdateSerializer)
     def put(self, request, pk):
         live_details = self.get_object(pk)
         statuss =live_details.session_status
@@ -76,13 +86,12 @@ class LiveDetailUpdateView(APIView):
 
             if session.session_status and session.session_status != 'Planned':
                 return Response("Cannot update once session status is Published", status=status.HTTP_403_FORBIDDEN)
-            
             serializer.save()
             response = {"message":"successfully updated","data":serializer.data}
             return Response(response,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
-
+    
     def delete(self, requset, pk):
         live_details = self.get_object(pk)
         live_details.delete()

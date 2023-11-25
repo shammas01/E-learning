@@ -27,6 +27,7 @@ class CourseDetailsModel(models.Model):
     rating = models.FloatField(null=True,blank=True)
     language = models.CharField(max_length=100)
     catogory = models.ForeignKey(CategoryModel,on_delete=models.SET_NULL,null=True,blank=True)
+    price = models.PositiveIntegerField(default=0,null=True)
 
     def __str__(self):
         return self.heading

@@ -4,6 +4,7 @@ from course.models import CourseDetailsModel
 from tutor.models import TutorModel
 from live.models import LiveClassDetailsModel
 from useraccount.models import User,UserProfile
+from . models import UserCart,CartItem
 
 
 
@@ -112,3 +113,17 @@ class LiveSelectSerializer(serializers.ModelSerializer):
                   'created_datetime',
                   'teacher',
                 )
+    
+        
+class UserCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserCart
+        fields = ('id', 'user', 'created_at', 'modified_at', 'is_active')
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    total_cost = serializers.ReadOnlyField(source='course.price')  # Calculate total_cost based on course price
+
+    class Meta:
+        model = CartItem
+        fields = ('id', 'cart', 'course', 'total_cost')

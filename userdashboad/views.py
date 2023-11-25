@@ -1,9 +1,8 @@
 import random,math
 from django.http import Http404
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
-from django.db.models import Q , Prefetch
+from django.db.models import Q 
 from course.models import CourseDetailsModel
 from live.models import LiveClassDetailsModel
 from . serializer import (
@@ -25,13 +24,16 @@ from useraccount.authentication.smtp import send_email
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from useraccount.models import UserProfile
+from useraccount.serializers import OtpSerializer,PhoneOtpSerializer
+from rest_framework.decorators import permission_classes
+from useraccount.authentication.twilio import send_phone_sms,phone_otp_verify
 # Create your views here.
 
 
 
 class UserProfileView(APIView):
-
     permission_classes = [IsAuthenticated]
+    
     serializer_class = UserProfileSerializer
     @extend_schema(responses=UserProfileSerializer)
     def get(self, request):
@@ -64,6 +66,84 @@ class UserProfileView(APIView):
                 request.session["otp"] = otp
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes([IsAuthenticated])
+class EmailUpdatdOtpView(APIView):
+    serializer_class = OtpSerializer
+
+    @extend_schema(responses=OtpSerializer)
+    def post(self, request):
+        serialize = OtpSerializer(data=request.data)
+        if serialize.is_valid():
+            otp = serialize.validated_data.get("otp")
+            saved_otp = request.session.get("otp")
+            email = request.session.get("email")
+            if otp == saved_otp:
+                user = request.user
+                user.email = email
+                user.save()
+                return Response("Email update successfully")
+            else:
+                return Response({"messege": "Invalid otp"})
+        return Response(serialize.error_messages, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes([IsAuthenticated])
+class VerifyMobileNumber(APIView):
+    serializer_class = PhoneOtpSerializer
+
+    @extend_schema(responses=PhoneOtpSerializer)
+    def post(self, request):
+        serializer = PhoneOtpSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            phone = serializer.validated_data.get("phone_number")
+            request.session["phone_number"] = phone
+            print(phone)
+            try:
+                verification_sid = send_phone_sms(phone)
+                print(verification_sid)
+                request.session["verification_sid"] = verification_sid
+                return Response(
+                    {"sid": verification_sid}, status=status.HTTP_201_CREATED
+                )
+            except Exception as e:
+                print(e)
+            return Response(
+                {"msg": "somthing wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@permission_classes([IsAuthenticated])
+class PhoneOtpVerificationView(APIView):
+    serializer_class = OtpSerializer
+
+    @extend_schema(responses=OtpSerializer)
+    def post(self, request):
+        serializer = OtpSerializer(data=request.data)
+        if serializer.is_valid():
+            otp = serializer.validated_data.get("otp")
+            verification_sid = request.session.get("verification_sid")
+            try:
+                verification_check = phone_otp_verify(verification_sid, otp)
+                print(verification_check.status)
+            except:
+                return Response({"msg": "Something Went Wrong..."})
+            if verification_check.status == "approved":
+                entered_phone_number = request.session.get("phone_number")
+                user_profile = UserProfile.objects.get(user=request.user)
+                user_profile.phone = entered_phone_number
+                user_profile.save()
+                response_data = {
+                    "msg": "your phone number is verifyed",
+                }
+                return Response(response_data)
+            return Response(
+                {"msg": "Something Went Wrong..."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -151,8 +231,6 @@ class LiveListing(APIView):
         return Response({"somting wrong with your live serializer"})
     
 
-
-
 # selecting one...............
 class TutorSelect(APIView):
     permission_classes=[AllowAny]
@@ -172,6 +250,9 @@ class TutorSelect(APIView):
 
 class CourseSelect(APIView):
     permission_classes = [AllowAny]
+
+    serializer_class = CourseSelectSerializer
+    @extend_schema(responses=CourseSelectSerializer)
     def get(self, request, pk):
         try:
             course = CourseDetailsModel.objects.get(id=pk)
@@ -184,8 +265,11 @@ class CourseSelect(APIView):
         return Response("not fond")
     
 
-
 class LiveSelect(APIView):
+    permission_classes = [AllowAny]
+
+    serializer_class = LiveSelectSerializer
+    @extend_schema(responses=LiveSelectSerializer)
     def get(self, request, pk):
         try:
             live = LiveClassDetailsModel.objects.get(id=pk)
@@ -198,3 +282,18 @@ class LiveSelect(APIView):
             return Response(serializer.data)
         return Response("live not found")
 
+
+
+from . models import UserCart,CartItem
+from . serializer import UserCartSerializer,CartItemSerializer
+
+class ShowCartView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            items = CartItem.objects.filter(cart__user=request.user)
+        except CartItem.DoesNotExist:
+            raise Http404("cart is empty")
+        print(items)
+        serializer = CartItemSerializer(items,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

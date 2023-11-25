@@ -1,5 +1,16 @@
 from django.urls import path
-from . views import CourseSearching,UserProfileView,LiveListing,CourseListing,TutorListing,TutorSelect,CourseSelect,LiveSelect
+from . views import (CourseSearching,
+                    UserProfileView,
+                    LiveListing,
+                    CourseListing,
+                    TutorListing,
+                    TutorSelect,
+                    CourseSelect,
+                    LiveSelect,
+                    EmailUpdatdOtpView,
+                    VerifyMobileNumber,
+                    PhoneOtpVerificationView,
+                    ShowCartView)
 
 urlpatterns = [
     path('searching/',CourseSearching.as_view(),name="course_searching"),
@@ -12,4 +23,9 @@ urlpatterns = [
     path('liveselect/<int:pk>/',LiveSelect.as_view(), name='one_live'),
    
     path("userprofile/", UserProfileView.as_view(), name="user_profile"),
+    path("emailupdate/", EmailUpdatdOtpView.as_view(), name="email_update_otp"),
+    path("phoneverify/", VerifyMobileNumber.as_view(), name="verifiy_phone_number"),
+    path("phoneotpverify/", PhoneOtpVerificationView.as_view(), name=" phoneotp"),
+
+    path('showcart/',ShowCartView.as_view(),name="show_cart"),
 ]

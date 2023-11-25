@@ -26,8 +26,8 @@ from drf_spectacular.utils import extend_schema
 
 
 class EmailOtpSendView(APIView):
+    
     serializer_class = Emailsmtpserializer
-
     @extend_schema(responses=Emailsmtpserializer)
     def post(self, request):
         serializer = Emailsmtpserializer(data=request.data)
@@ -49,8 +49,8 @@ class EmailOtpSendView(APIView):
 
 
 class EmailOtpVerifyView(APIView):
+    
     serializer_class = OtpSerializer
-
     @extend_schema(responses=OtpSerializer)
     def post(self, requset):
         serializer = OtpSerializer(data=requset.data)
@@ -69,31 +69,9 @@ class EmailOtpVerifyView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-@permission_classes([IsAuthenticated])
-class EmailUpdatdOtpView(APIView):
-    serializer_class = OtpSerializer
-
-    @extend_schema(responses=OtpSerializer)
-    def post(self, request):
-        serialize = OtpSerializer(data=request.data)
-        if serialize.is_valid():
-            otp = serialize.validated_data.get("otp")
-            saved_otp = request.session.get("otp")
-            email = request.session.get("email")
-            if otp == saved_otp:
-                user = request.user
-                user.email = email
-                user.save()
-                return Response("Email update successfully")
-            else:
-                return Response({"messege": "Invalid otp"})
-        return Response(serialize.error_messages, status=status.HTTP_400_BAD_REQUEST)
-
-
 class GoogleSocialAuthView(APIView):
-    serializer_class = GoogleSocialAuthSerializer
 
+    serializer_class = GoogleSocialAuthSerializer
     @extend_schema(responses=GoogleSocialAuthSerializer)
     def post(self, request):
         serializer = GoogleSocialAuthSerializer(data=request.data)
@@ -103,58 +81,3 @@ class GoogleSocialAuthView(APIView):
 
 
 
-@permission_classes([IsAuthenticated])
-class VerifyMobileNumber(APIView):
-    serializer_class = PhoneOtpSerializer
-
-    @extend_schema(responses=PhoneOtpSerializer)
-    def post(self, request):
-        serializer = PhoneOtpSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            phone = serializer.validated_data.get("phone_number")
-            request.session["phone_number"] = phone
-            print(phone)
-            try:
-                verification_sid = send_phone_sms(phone)
-                print(verification_sid)
-                request.session["verification_sid"] = verification_sid
-                return Response(
-                    {"sid": verification_sid}, status=status.HTTP_201_CREATED
-                )
-            except Exception as e:
-                print(e)
-            return Response(
-                {"msg": "somthing wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@permission_classes([IsAuthenticated])
-class PhoneOtpVerificationView(APIView):
-    serializer_class = OtpSerializer
-
-    @extend_schema(responses=OtpSerializer)
-    def post(self, request):
-        serializer = OtpSerializer(data=request.data)
-        if serializer.is_valid():
-            otp = serializer.validated_data.get("otp")
-            verification_sid = request.session.get("verification_sid")
-            try:
-                verification_check = phone_otp_verify(verification_sid, otp)
-                print(verification_check.status)
-            except:
-                return Response({"msg": "Something Went Wrong..."})
-            if verification_check.status == "approved":
-                entered_phone_number = request.session.get("phone_number")
-                user_profile = UserProfile.objects.get(user=request.user)
-                user_profile.phone = entered_phone_number
-                user_profile.save()
-                response_data = {
-                    "msg": "your phone number is verifyed",
-                }
-                return Response(response_data)
-            return Response(
-                {"msg": "Something Went Wrong..."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
