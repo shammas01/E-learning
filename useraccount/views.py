@@ -1,39 +1,44 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import User, UserProfile
+from .models import User
 from .serializers import (
     Emailsmtpserializer,
     OtpSerializer,
-    UserProfileSerializer,
     GoogleSocialAuthSerializer,
-    PhoneOtpSerializer,
+
+
+    UserRegisterSerializer
 )
 import math, random
-from django.conf import settings
 from useraccount.authentication.smtp import send_email
 from useraccount.authentication.jwt import get_tokens_for_user
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import (
-    IsAuthenticated,
-)
-from rest_framework.decorators import permission_classes
-from useraccount.authentication.twilio import send_phone_sms, phone_otp_verify
-from drf_spectacular.utils import extend_schema
 
+from drf_spectacular.utils import extend_schema
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import authenticate
 
 # Create your views here.
 
 
-class EmailOtpSendView(APIView):
-    
-    serializer_class = Emailsmtpserializer
-    @extend_schema(responses=Emailsmtpserializer)
+class RegisterEmailSendView(APIView):
+    permission_classes_classes = [AllowAny]
+    serializer_class = UserRegisterSerializer
+    @extend_schema(responses=UserRegisterSerializer)
     def post(self, request):
-        serializer = Emailsmtpserializer(data=request.data)
+        serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data.get("email")
+            password = serializer.validated_data.get('password')
+            
+
+            User.objects.create_user(
+                email = email,
+                password = password,
+            )
+
             otp = math.floor((random.randint(100000, 999999)))
+            print(otp)
             subject = "Otp for account verification"
             message = f"Your otp for account verification {otp}"
             # email_from = settings.EMAIL_HOST_USER
@@ -41,6 +46,7 @@ class EmailOtpSendView(APIView):
             send_email(subject=subject, message=message, email=recipient_list[0])
             request.session["email"] = email
             request.session["otp"] = otp
+            request.session['password'] = password
             return Response(
                 {"email": email, "messegte": "email send successfully"},
                 status=status.HTTP_200_OK,
@@ -48,24 +54,30 @@ class EmailOtpSendView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EmailOtpVerifyView(APIView):
-    
+class loginView(APIView):
     serializer_class = OtpSerializer
     @extend_schema(responses=OtpSerializer)
     def post(self, requset):
         serializer = OtpSerializer(data=requset.data)
+    
         if serializer.is_valid():
             otp = serializer.validated_data.get("otp")
+            password = serializer.validated_data.get('password')
             email = requset.session.get("email")
             saved_otp = requset.session.get("otp")
-            if otp == saved_otp:
-                user = User.objects.get_or_create(email=email)
-                token = get_tokens_for_user(user[0])
+            saved_password = requset.session.get('password')
+
+            
+            if otp == saved_otp and password == saved_password:
+                user = User.objects.get(email=email)
+                token = get_tokens_for_user(user)
                 response = {
+                    "Your email": email,
                     "token": token,
                     "messege": "your account successfull activated",
                 }
                 return Response(response, status=status.HTTP_200_OK)
+            return Response("somthing wrong....!")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

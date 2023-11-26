@@ -8,6 +8,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, username=None, password=None, **kwargs):
         if not email:
             raise ValueError("Users must have an email address")
+        
         user = self.model(email=self.normalize_email(email), username=username)
         user.set_password(password)
         user.save(using=self._db)
@@ -33,7 +34,7 @@ class User(AbstractBaseUser):
     )
     username = models.CharField(max_length=255, null=True, blank=True, unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     date_joined = models.DateField(auto_now=True)
 
@@ -43,10 +44,10 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ["username"]
 
     def __str__(self):
-        if self.username is not None:
-            return self.username
-        elif self.email is not None:
+        if self.email is not None:
             return self.email
+        elif self.username is not None:
+            return self.username
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"

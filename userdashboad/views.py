@@ -13,7 +13,9 @@ from . serializer import (
                           UserProfileSerializer,
                           TutorSelectSerializer,
                           CourseSelectSerializer,
-                          LiveSelectSerializer)
+                          LiveSelectSerializer,
+                          UserCartSerializer,
+                          CartItemSerializer)
 from rest_framework.response import Response
 from rest_framework import status 
 from tutor.models import TutorModel
@@ -27,6 +29,8 @@ from useraccount.models import UserProfile
 from useraccount.serializers import OtpSerializer,PhoneOtpSerializer
 from rest_framework.decorators import permission_classes
 from useraccount.authentication.twilio import send_phone_sms,phone_otp_verify
+from . models import UserCart,CartItem
+
 # Create your views here.
 
 
@@ -284,16 +288,56 @@ class LiveSelect(APIView):
 
 
 
-from . models import UserCart,CartItem
-from . serializer import UserCartSerializer,CartItemSerializer
+
 
 class ShowCartView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
             items = CartItem.objects.filter(cart__user=request.user)
+            serializer = CartItemSerializer(items,many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except CartItem.DoesNotExist:
             raise Http404("cart is empty")
-        print(items)
-        serializer = CartItemSerializer(items,many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+
+
+class AddToCart(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request): 
+
+        serializer = CartItemSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            new_course = serializer.validated_data.get('course')
+            if CartItem.objects.filter(cart__user=request.user, course=new_course).exists():
+                return Response("This item is already added to the cart", status=status.HTTP_400_BAD_REQUEST)
+            
+            items = CartItem.objects.create(
+                cart = request.user.usercart,
+                course = serializer.validated_data.get('course')
+            )
+            print(items.cart,items.course)
+            return Response("item added")
+        return Response(serializer.errors)
+    
+
+
+class Adtocart(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, pk):    
+        try:
+            course = CourseDetailsModel.objects.get(id=pk)
+        except CourseDetailsModel.DoesNotExist:
+            raise Http404("this course not found")
+        if CartItem.objects.filter(cart__user=request.user, course=course).exists():
+            return Response("This item is already added to the cart", status=status.HTTP_400_BAD_REQUEST)
+        if course:
+            cart_item = CartItem(
+                cart = request.user.usercart,
+                course = course
+            )
+            cart_item.save()
+            return Response("your item added")
+        
+        

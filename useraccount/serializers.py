@@ -8,12 +8,16 @@ from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed
 
 
-class Emailsmtpserializer(serializers.Serializer):
+class Emailsmtpserializer(serializers.ModelSerializer):
     email = serializers.EmailField()
+
 
 
 class OtpSerializer(serializers.Serializer):
     otp = serializers.IntegerField()
+    password = serializers.CharField()
+
+    
 
 
 class PhoneOtpSerializer(serializers.Serializer):
@@ -87,8 +91,24 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-    
+class UserRegisterSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(style={'input_type':'password'}, write_only=True)
+    class Meta:
+        model = User
+        fields = ('email','password','password2')
 
+    def validate(self, attrs):
+        password = attrs.get('password')
+        password2 = attrs.get('password2')
+
+        if len(password)<=4:
+          raise serializers.ValidationError("password must contain atleast 5 characters")
+        if password != password2:
+          raise serializers.ValidationError("Password and Confirm Password doesn't match")
+        return attrs
+    
+    def create(self, validate_data):
+        return User.objects.create_user(**validate_data)
 
 # google retuned data from when we pass auth token.
 user_data = {

@@ -10,7 +10,9 @@ from . views import (CourseSearching,
                     EmailUpdatdOtpView,
                     VerifyMobileNumber,
                     PhoneOtpVerificationView,
-                    ShowCartView)
+                    ShowCartView,
+                    AddToCart,
+                    Adtocart) #adtocart for sample
 
 urlpatterns = [
     path('searching/',CourseSearching.as_view(),name="course_searching"),
@@ -28,4 +30,6 @@ urlpatterns = [
     path("phoneotpverify/", PhoneOtpVerificationView.as_view(), name=" phoneotp"),
 
     path('showcart/',ShowCartView.as_view(),name="show_cart"),
+    path('addtocart/',AddToCart.as_view(),name='add_to_cart'),
+    path('ad/<int:pk>/',Adtocart.as_view())
 ]
