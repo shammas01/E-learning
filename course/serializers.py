@@ -5,7 +5,7 @@ class CourseDetailsListCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CourseDetailsModel
-        fields = ['id','heading','contents','description','duration','language','catogory']
+        fields = ['id','heading','contents','description','duration','language','price']
         
 
     
@@ -24,6 +24,7 @@ class CourseDetailsSerializer(serializers.ModelSerializer):
         instance.duration = validated_data.get('duration',instance.duration)
         instance.language = validated_data.get('language',instance.language)
         instance.catogory = validated_data.get('catogory',instance.catogory)
+        instance.price = validated_data.get('price',instance.price)
 
         instance.save()
         return instance

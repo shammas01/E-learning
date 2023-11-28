@@ -19,8 +19,18 @@ class CartItem(models.Model):
     course = models.ForeignKey(CourseDetailsModel, on_delete=models.CASCADE)
 
     @property
-    def total_cost(self):
+    def price(self):
         return  self.course.price
     
     def __str__(self):
         return str(self.course.heading)
+    
+
+
+
+
+class OrderPlaced(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    course = models.OneToOneField(CourseDetailsModel, on_delete=models.PROTECT)
+    ordered_date = models.DateTimeField(auto_now_add=True)
+    

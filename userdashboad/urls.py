@@ -12,7 +12,8 @@ from . views import (CourseSearching,
                     PhoneOtpVerificationView,
                     ShowCartView,
                     AddToCart,
-                    Adtocart) #adtocart for sample
+                    Adtocart,  #adtocart for sample
+                    Checkout) 
 
 urlpatterns = [
     path('searching/',CourseSearching.as_view(),name="course_searching"),
@@ -31,5 +32,7 @@ urlpatterns = [
 
     path('showcart/',ShowCartView.as_view(),name="show_cart"),
     path('addtocart/',AddToCart.as_view(),name='add_to_cart'),
-    path('ad/<int:pk>/',Adtocart.as_view())
+    path('addtocart/<int:pk>/',Adtocart.as_view()),
+
+    path('checkout/',Checkout.as_view(),name='checkout'),
 ]

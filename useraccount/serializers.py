@@ -12,11 +12,13 @@ class Emailsmtpserializer(serializers.ModelSerializer):
     email = serializers.EmailField()
 
 
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
 
 class OtpSerializer(serializers.Serializer):
     otp = serializers.IntegerField()
-    password = serializers.CharField()
-
     
 
 

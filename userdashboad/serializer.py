@@ -123,8 +123,10 @@ class UserCartSerializer(serializers.ModelSerializer):
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    total_cost = serializers.ReadOnlyField(source='course.price')
+    price = serializers.ReadOnlyField(source='course.price')
 
     class Meta:
         model = CartItem
-        fields = ('id', 'course', 'total_cost')
+        fields = ('id', 'course', 'price')
+
+    

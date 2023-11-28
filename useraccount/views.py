@@ -1,12 +1,12 @@
+from django.http import Http404
 from rest_framework.views import APIView
 from .models import User
 from .serializers import (
     Emailsmtpserializer,
     OtpSerializer,
     GoogleSocialAuthSerializer,
-
-
-    UserRegisterSerializer
+    UserRegisterSerializer,
+    LoginSerializer
 )
 import math, random
 from useraccount.authentication.smtp import send_email
@@ -52,32 +52,53 @@ class RegisterEmailSendView(APIView):
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class EmailVerify(APIView):
+
+    serializer_class = LoginSerializer
+    @extend_schema(responses=LoginSerializer)
+    def post(self, request):
+        otp = request.data.get('otp')
+        saved_otp = request.session.get('otp')
+        email = request.session.get('email')
+        if otp == saved_otp:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                raise Http404('user not found')
+            user.is_active = True
+            user.save()
+            return Response("you account successfull activated")
+        return Response("invalid otp")
+
 
 
 class loginView(APIView):
-    serializer_class = OtpSerializer
-    @extend_schema(responses=OtpSerializer)
+
+    serializer_class = LoginSerializer
+    @extend_schema(responses=LoginSerializer)
     def post(self, requset):
-        serializer = OtpSerializer(data=requset.data)
+        serializer = LoginSerializer(data=requset.data)
     
         if serializer.is_valid():
-            otp = serializer.validated_data.get("otp")
+            email = serializer.validated_data.get('email')
             password = serializer.validated_data.get('password')
-            email = requset.session.get("email")
-            saved_otp = requset.session.get("otp")
-            saved_password = requset.session.get('password')
-
-            
-            if otp == saved_otp and password == saved_password:
+            try:
                 user = User.objects.get(email=email)
-                token = get_tokens_for_user(user)
+            except User.DoesNotExist:
+                raise Http404('user not found')
+
+            if user.is_active == True:
+                user1 = authenticate(email=email,password=password)
+                token = get_tokens_for_user(user1)
                 response = {
                     "Your email": email,
                     "token": token,
                     "messege": "your account successfull activated",
                 }
                 return Response(response, status=status.HTTP_200_OK)
-            return Response("somthing wrong....!")
+            return Response("verify you emeil otp then try to log..!")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

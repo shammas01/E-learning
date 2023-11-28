@@ -54,7 +54,8 @@ class ListCreateCourseDetailsView(APIView):
                     description = serializer.validated_data.get('description'),
                     duration = serializer.validated_data.get('duration'),
                     language = serializer.validated_data.get('language'),
-                    catogory = serializer.validated_data.get('catogory')
+                    catogory = serializer.validated_data.get('catogory'),
+                    price = serializer.validated_data.get('price')
                 )
                 response = {"messege":"courser detail are created",
                             "data":serializer.data}
@@ -101,7 +102,6 @@ class RetriveUpdateCourseDetailsView(APIView):
         course = self.get_object(pk)
         course.delete()
         return Response({"messege":"your course removed"},status=status.HTTP_204_NO_CONTENT)
-
 
 
 

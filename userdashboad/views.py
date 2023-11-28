@@ -292,18 +292,34 @@ class LiveSelect(APIView):
 
 class ShowCartView(APIView):
     permission_classes = [IsAuthenticated]
+
+    serializer_class = CartItemSerializer
+    @extend_schema(responses=CartItemSerializer)
     def get(self, request):
         try:
             items = CartItem.objects.filter(cart__user=request.user)
-            serializer = CartItemSerializer(items,many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if items:
+                total_cost = 0
+                for item in items:
+                    cost = item.price
+                    total_cost += cost
+                serializer = CartItemSerializer(items,many=True)
+                response = {
+                    "data":serializer.data,
+                    "total_cost":total_cost
+                }
+                return Response(response, status=status.HTTP_200_OK)
+            return Response("cart is empty")
         except CartItem.DoesNotExist:
-            raise Http404("cart is empty")
+            return Response("not found")
         
 
 
 class AddToCart(APIView):
     permission_classes = [IsAuthenticated]
+
+    serializer_class = CartItemSerializer
+    @extend_schema(responses=CartItemSerializer)
     def post(self, request): 
 
         serializer = CartItemSerializer(data=request.data)
@@ -325,6 +341,8 @@ class AddToCart(APIView):
 
 class Adtocart(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = CartItemSerializer
+
     def post(self, request, pk):    
         try:
             course = CourseDetailsModel.objects.get(id=pk)
@@ -340,4 +358,18 @@ class Adtocart(APIView):
             cart_item.save()
             return Response("your item added")
         
-        
+
+
+class Checkout(APIView):
+    def post(self, request):
+        user = request.user 
+        cartitems = CartItem.objects.all()
+        if cartitems:
+            total_cost = 0
+            for item in cartitems:
+                cost = item.price
+                total_cost += cost
+                
+
+            return Response(total_cost)
+        return Response("you should add a course to cart")

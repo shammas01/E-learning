@@ -37,7 +37,7 @@ class TutorListCreateView(APIView):
                 )
                 tutor.save()
 
-                subject = "Registration For Tutor"
+                subject = "Application For Tutor"
                 messege = "Congragulation your application has been saved. We will contact you"
                 send_email_for_tutor(subject=subject, message=messege, email=tutor.user)
 
@@ -105,6 +105,7 @@ class TutorUpdateView(APIView):
         print(tutor_profile)
         tutor_profile.delete()
         return Response({"message":"tutor was successfull deleted"},status=status.HTTP_404_NOT_FOUND)
+
 
 class PhoneOtpVerifyView(APIView):
     permission_classes = [IsAuthenticated]
