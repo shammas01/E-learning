@@ -1,4 +1,5 @@
 import random,math
+from django.conf import settings
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
@@ -360,16 +361,132 @@ class Adtocart(APIView):
         
 
 
+
+# pyment with stripe.............
+from . serializer import CardInformationSerializer
+import stripe
+
+
+
 class Checkout(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         user = request.user 
-        cartitems = CartItem.objects.all()
+        cartitems = CartItem.objects.filter(cart__user=user)
         if cartitems:
             total_cost = 0
             for item in cartitems:
                 cost = item.price
                 total_cost += cost
-                
 
             return Response(total_cost)
         return Response("you should add a course to cart")
+
+
+
+
+
+from django.conf import settings
+
+class PaymentAPI(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CardInformationSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            response = self.stripe_card_payment(data_dict=data_dict)
+        else:
+            response = {'errors': serializer.errors, 'status':status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+    
+
+    def stripe_card_payment(self, data_dict):
+        
+            card_details = stripe.PaymentMethod.create(
+                type='card',
+                card={
+                    # "number": data_dict['card_number'],
+                    # "exp_month": data_dict['expiry_month'],
+                    # "exp_year": data_dict['expiry_year'],
+                    # "cvc": data_dict['cvc'],
+
+                    "token": 'tok_visa',
+                }
+            )
+
+            cart_courses = CartItem.objects.all()
+            if cart_courses:
+                total_amount=0
+                for course in cart_courses:
+                    total_amount += course.price
+                total_amount
+
+            
+
+            payment_intent = stripe.PaymentIntent.create(
+                amount=total_amount*1, 
+                currency='inr',
+                payment_method=card_details.id,
+                automatic_payment_methods={
+                    'enabled': True,
+                    'allow_redirects':'never'
+                }, 
+            )
+            
+                
+            try:
+                payment_confirm = stripe.PaymentIntent.confirm(
+                    payment_intent['id']
+                )
+                
+                payment_intent_modified = stripe.PaymentIntent.retrieve(payment_intent['id'])
+                print("pyment.............",payment_intent_modified,">>>><<<<<>>>>><<<>>><><",payment_intent_modified.status)
+                
+            except:
+                payment_intent_modified = stripe.PaymentIntent.retrieve(payment_intent['id'])
+                payment_confirm = {
+                    "stripe_payment_error": "Failed",
+                    "code": payment_intent_modified['last_payment_error']['code'],
+                    "message": payment_intent_modified['last_payment_error']['message'],
+                    'status': "Failed"
+                }
+                
+            if payment_intent_modified and payment_intent_modified['status'] == 'succeeded':
+                response = {
+                    'message': "Card Payment Success",
+                    'status': status.HTTP_200_OK,
+                    "card_details": card_details,
+                    "payment_intent": payment_intent_modified,
+                    "payment_confirm": payment_confirm
+                }
+            else:
+                response = {
+                    'message': "Card Payment Failed",
+                    'status': status.HTTP_400_BAD_REQUEST,
+                    "card_details": card_details,
+                    "payment_intent": payment_intent_modified,
+                    "payment_confirm": payment_confirm
+                }
+            
+        
+            # response = {
+            #     'error': "Your card number is incorrect",
+            #     'status': status.HTTP_400_BAD_REQUEST,
+            #     "payment_intent": {"id": "Null"},
+            #     "payment_confirm": {'status': "Failed"}
+            # }
+            return response
+
+
+
+
+
+        
+
+
+
