@@ -23,6 +23,7 @@ from django.contrib.auth import authenticate
 
 class RegisterEmailSendView(APIView):
     permission_classes_classes = [AllowAny]
+    
     serializer_class = UserRegisterSerializer
     @extend_schema(responses=UserRegisterSerializer)
     def post(self, request):

@@ -24,7 +24,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("useraccount.urls")),
+    path("reg/", include("useraccount.urls")),
     path("tutor/", include("tutor.urls")),
     path("course/", include("course.urls")),
     path("live/",include("live.urls")),
@@ -32,7 +32,7 @@ urlpatterns = [
 
     
     # for swagger documatetion
-    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("donwld/", SpectacularAPIView.as_view(), name="schema"),
     path("elearning/check/", SpectacularSwaggerView.as_view(url_name="schema")),
 ]
 

@@ -415,7 +415,7 @@ class PaymentAPI(APIView):
                     # "exp_year": data_dict['expiry_year'],
                     # "cvc": data_dict['cvc'],
 
-                    "token": 'tok_visa',
+                    "token": "tok_visa",
                 }
             )
 
@@ -434,14 +434,15 @@ class PaymentAPI(APIView):
                 payment_method=card_details.id,
                 automatic_payment_methods={
                     'enabled': True,
-                    'allow_redirects':'never'
+                    'allow_redirects':'always'
                 }, 
             )
             
                 
             try:
                 payment_confirm = stripe.PaymentIntent.confirm(
-                    payment_intent['id']
+                    payment_intent['id'],
+                    return_url='http://127.0.0.1:8000/user/userprofile/'
                 )
                 
                 payment_intent_modified = stripe.PaymentIntent.retrieve(payment_intent['id'])
@@ -456,7 +457,7 @@ class PaymentAPI(APIView):
                     'status': "Failed"
                 }
                 
-            if payment_intent_modified and payment_intent_modified['status'] == 'succeeded':
+            if payment_intent_modified and payment_intent_modified['status'] != 'succeeded':
                 response = {
                     'message': "Card Payment Success",
                     'status': status.HTTP_200_OK,

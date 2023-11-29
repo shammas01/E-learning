@@ -5,7 +5,7 @@ from .models import TutorModel, SkillModel
 class TutorSerializer(serializers.ModelSerializer):
     class Meta:
         model = TutorModel
-        fields = ("name","profile_picture", "skills", "resume", "phone","approved")
+        fields = ("name","profile_picture", "skills", "resume", "phone")
 
 
 class TutorUpdateSerializer(serializers.ModelSerializer):
