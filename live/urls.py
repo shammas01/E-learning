@@ -1,8 +1,12 @@
 from django.urls import path
-from . views import LiveDetailListCreateView,LiveDetailUpdateView
+from . views import LiveDetailListCreateView,LiveDetailUpdateView,testView
 
 urlpatterns = [
     path('live-create/', LiveDetailListCreateView.as_view(),name='live_create'),
-    path('live-update/<int:pk>/',LiveDetailUpdateView.as_view(),name='live_update')
+    path('live-update/<int:pk>/',LiveDetailUpdateView.as_view(),name='live_update'),
+
+
+    # celery...
+    path('celery/',testView,name="testView")
 
 ]

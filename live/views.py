@@ -98,3 +98,11 @@ class LiveDetailUpdateView(APIView):
         return Response("Deleted your live session",status=status.HTTP_404_NOT_FOUND)
     
 
+# celery configration
+from . tasks import fun
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def testView(request):
+    fun.delay()
+    return HttpResponse("Done")
