@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 from rest_framework.views import APIView
 from useraccount.models import User
@@ -58,7 +59,11 @@ class TutorListCreateView(APIView):
     serializer_class = TutorSerializer
     @extend_schema(responses=TutorSerializer)
     def get(self, request):
-        tutor = TutorModel.objects.get(user=request.user)
+        try:
+            tutor = TutorModel.objects.get(user=request.user)
+        except TutorModel.DoesNotExist:
+            raise Http404
+        
         if tutor.is_block is False:
             if tutor.approved is True:
                 serializer = TutorSerializer(tutor)
@@ -71,7 +76,25 @@ class TutorListCreateView(APIView):
 
     
 class TutorUpdateView(APIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
+
+    serializer_class = TutorSerializer
+    @extend_schema(responses=TutorSerializer)
+    def get(self, request):
+        try:
+            tutor = TutorModel.objects.get(user=request.user)
+        except TutorModel.DoesNotExist:
+            raise Http404
+        if tutor.is_block is False:
+            if tutor.approved is True:
+                serializer = TutorSerializer(tutor)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"messege": "your application still pending. we will contact you"}
+                )
+        return Response({"messege": "you are blocked. contact with admin"})
+    
     serializer_class = TutorUpdateSerializer
     @extend_schema(responses=TutorUpdateSerializer)
     def put(self, request):

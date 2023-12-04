@@ -15,7 +15,7 @@ class TutorModel(models.Model):
         "SkillModel", related_name="tutors"
     )
     resume = models.FileField(upload_to="tutor_files/resume/", null=True, blank=True)
-    phone = models.CharField(max_length=13, unique=True, null=True)
+    phone = models.CharField(max_length=13, unique=True)
     is_block = models.BooleanField(default=False)
 
     def __str__(self):

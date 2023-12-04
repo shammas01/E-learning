@@ -16,15 +16,30 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
+    def validate(self, attrs):
+        password = attrs.get('password')
+        if len(password)<=4:
+            raise serializers.ValidationError("password must contain atleast 5 characters")
+        return attrs
+
 
 class OtpSerializer(serializers.Serializer):
     otp = serializers.IntegerField()
+    def validate(self, attrs):
+        otp = attrs.get('otp')
+        if len(otp)<=4:
+            raise serializers.ValidationError("password must contain atleast 5 characters")
+        return attrs
     
 
 
 class PhoneOtpSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
-
+    def validate(self, attrs):
+        phone_number = attrs.get('phone_number')
+        if len(phone_number)<=9:
+            raise serializers.ValidationError("phone number invalid")
+        return attrs
 
 class GoogleSocialAuthSerializer(serializers.Serializer):
     auth_token = serializers.CharField()
