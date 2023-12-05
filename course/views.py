@@ -30,8 +30,10 @@ class ListCreateCourseDetailsView(APIView):
     @extend_schema(responses=CourseDetailsListCreateSerializer)
     def get(self, request):
         data = CourseDetailsModel.objects.filter(tutor=request.user.tutormodel)
-        serializer= CourseDetailsListCreateSerializer(data,many=True)
-        return Response(serializer.data)
+        if data:
+            serializer= CourseDetailsListCreateSerializer(data,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response("you have no courses",status=status.HTTP_404_NOT_FOUND)
 
 
     serializer_class = CourseDetailsListCreateSerializer
@@ -69,7 +71,6 @@ class ListCreateCourseDetailsView(APIView):
 class RetriveUpdateCourseDetailsView(APIView):
     permission_classes = [IsAuthenticated,IsTutorOrReadOnly]
     
-
     @extend_schema(responses=CourseDetailsSerializer)
     def get_object(self, pk):
         try:

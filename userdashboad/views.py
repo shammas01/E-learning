@@ -153,6 +153,7 @@ class PhoneOtpVerificationView(APIView):
 
 
 
+#page inter face......................
 class CourseSearching(APIView):
     permission_classes = [AllowAny]
 
@@ -222,12 +223,9 @@ class LiveListing(APIView):
     @extend_schema(responses=LiveListSerializer)
     def get(self,request):
         try:
-            lives = LiveClassDetailsModel.objects.filter(
-                session_status='Published'
-            )
-
+            lives = LiveClassDetailsModel.objects.all()
         except LiveClassDetailsModel.DoesNotExist:
-            raise Http404("live not found")
+            raise Http404
         
         if lives:
             serializer = LiveListSerializer(lives,many=True)
@@ -284,8 +282,8 @@ class LiveSelect(APIView):
         
         if live:
             serializer = LiveSelectSerializer(live)
-            return Response(serializer.data)
-        return Response("live not found")
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response("live not found",status=status.HTTP_404_NOT_FOUND)
 
 
 

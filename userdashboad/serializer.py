@@ -63,7 +63,7 @@ class CourseSearchSerializer(serializers.ModelSerializer):
 class TutorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = TutorModel
-        fields = ('id','name','profile_picture','skills','phone')
+        fields = ('id','name','profile_picture','skills')
 
 
 class CourseListSerializer(serializers.ModelSerializer):
@@ -75,7 +75,7 @@ class CourseListSerializer(serializers.ModelSerializer):
 class LiveListSerializer(serializers.ModelSerializer):
     class Meta:
         model =  LiveClassDetailsModel
-        fields = ('id','teacher','title','session_type')
+        fields = ('id','teacher','title','session_type','session_status')
 
 
 

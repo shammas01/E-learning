@@ -1,5 +1,5 @@
 import os
-
+from celery.schedules import crontab
 from celery import Celery
 from django.conf import settings
 
@@ -30,5 +30,13 @@ def debug_task(self):
 
 #celery beat settings
 app.conf.beat_schedule={
-
+    'send-mail-everyday-at-7':{
+        'task':'live.tasks.send_mail_func',
+        'schedule': crontab(hour=13,minute=39),
+        # we can pass arguments here and we can use those in
+        # firemailapp/tasks.py send_mail_func function for 
+        # that you need one extra argument in your function
+        # currently we are not doing that
+        # 'args': (1000,)  
+    }
 }

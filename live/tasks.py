@@ -15,7 +15,7 @@ def send_mail_func(self):
     users=User.objects.all()
     for user in users:
         mail_subject="hello celery"
-        message="subscribe TheCodeSpace Youtube channel."
+        message="your calss will start today 10:00 am"
         to_email=user.email
         send_mail(
             subject=mail_subject,

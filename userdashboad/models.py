@@ -1,6 +1,7 @@
 from django.db import models
 from useraccount.models import User
 from course.models import CourseDetailsModel
+from live.models import LiveClassDetailsModel
 
 # Create your models here.
 
@@ -27,10 +28,13 @@ class CartItem(models.Model):
     
 
 
-
-
 class OrderPlaced(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     course = models.OneToOneField(CourseDetailsModel, on_delete=models.PROTECT)
     ordered_date = models.DateTimeField(auto_now_add=True)
-    
+
+
+class liveEnroll(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    lives = models.ForeignKey(LiveClassDetailsModel,on_delete=models.CASCADE)
+    enrolled_date = models.DateField(auto_now_add=True)

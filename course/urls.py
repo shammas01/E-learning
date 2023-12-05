@@ -6,7 +6,7 @@ from . views import ListCreateCourseDetailsView,RetriveUpdateCourseDetailsView,L
 
 
 urlpatterns = [
-    path('course-list/',ListCreateCourseDetailsView.as_view(),name='course_details'),
+    path('course-create/',ListCreateCourseDetailsView.as_view(),name='course_details'),
     path('course-update/<int:pk>/',RetriveUpdateCourseDetailsView.as_view(),name='course_update'),
 
     path('list-lesson/<int:course_id>/',ListCreateCourseLessontView.as_view(),name='course_list'),

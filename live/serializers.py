@@ -56,6 +56,5 @@ class liveDetailUpdateSerializer(serializers.ModelSerializer):
             message += f"Your published date is: {instance.last_updated_datetime}"
 
             teacher = instance.teacher
-            print(teacher)
             send_email_live_confierm(subject=subject,message=message,email=teacher)
         return super().update(instance, validated_data)
