@@ -116,6 +116,7 @@ class LiveSelectSerializer(serializers.ModelSerializer):
                 )
 
 
+
 class UserCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserCart
@@ -178,4 +179,11 @@ class CardInformationSerializer(serializers.Serializer):
         validators=[check_cvc],
     )
 
+
+
+class LiveEnrollSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LiveClassDetailsModel
+        fields = ('id','teacher','title','session_status')
+    
     

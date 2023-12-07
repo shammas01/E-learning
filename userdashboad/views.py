@@ -433,7 +433,7 @@ class PaymentAPI(APIView):
                 automatic_payment_methods={
                     'enabled': True,
                     'allow_redirects':'always'
-                }, 
+                },
             )
             
                 
@@ -485,7 +485,99 @@ class PaymentAPI(APIView):
 
 
 
+
+from . serializer import LiveEnrollSerializer
+from . models import liveEnroll
+class LiveEnrollment(APIView):
+    permission_classes = [IsAuthenticated]
+    def get_object(self,pk):
+        try:
+            return LiveClassDetailsModel.objects.get(id=pk)
+        except LiveClassDetailsModel.DoesNotExist:
+            raise Http404
+
+    def get(self,request,pk):
+        data = self.get_object(pk)
+        serializer = LiveSelectSerializer(data)
+        return Response(serializer.data)
         
 
+    def post(self, request,pk):
+        data = self.get_object(pk)
+        live_enrollments = liveEnroll.objects.filter(
+        user=request.user, 
+        lives=data)
+        if data.session_status != 'Published':
+            return Response("enroll after publishing")
+        if live_enrollments.exists():
+            return Response('You have already enrolled in this live session')
+        
+        response = {}
+        serializer = CardInformationSerializer(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            response = self.strip_card_payment(data_dict=data_dict,live_object=data,user=request.user)
+        else:
+            response = {'errors': serializer.errors, 'status':status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+    
+    def strip_card_payment(self, data_dict, live_object, user):
+        total_amount = live_object.pricing
 
-
+        card_details = stripe.PaymentMethod.create(
+            type='card',
+            card = {
+                "token":"tok_visa"
+            }
+        )
+        total_amount_in_paise = int(total_amount * 100)
+        
+        payment_intent = stripe.PaymentIntent.create(
+            amount=total_amount_in_paise,
+            currency='inr',
+            payment_method=card_details.id,
+            automatic_payment_methods={
+                "enabled":True,
+                "allow_redirects":'always'
+            }
+        )
+        print(payment_intent.amount)
+        
+        try:
+            payment_confirm = stripe.PaymentIntent.confirm(
+                payment_intent['id'],
+                return_url='http://127.0.0.1:8000/user/userprofile/'
+            )
+            payment_intent_modified = stripe.PaymentIntent.retrieve(payment_intent['id'])
+            print(payment_intent_modified['status'])
+        except:
+            payment_intent_modified = stripe.PaymentIntent.retrieve(payment_intent['id'])
+            payment_confirm = {
+                "stripe_payment_error": "Failed",
+                "code": payment_intent_modified['last_payment_error']['code'],
+                "message": payment_intent_modified['last_payment_error']['message'],
+                'status': "Failed"
+            }
+            
+        if payment_intent_modified and payment_intent_modified['status'] != 'succeeded':
+            response = {
+                    'message': "Card Payment Success",
+                    'status': status.HTTP_200_OK,
+                    "card_details": card_details,
+                    "payment_intent": payment_intent_modified,
+                    "payment_confirm": payment_confirm
+                }
+            add_live = liveEnroll.objects.create(
+                user = user,
+                lives = live_object
+            )
+        else:
+            response = {
+                'message': "Card Payment Failed",
+                'status': status.HTTP_400_BAD_REQUEST,
+                "card_details": card_details,
+                "payment_intent": payment_intent_modified,
+                "payment_confirm": payment_confirm
+            }
+        return response

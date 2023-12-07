@@ -14,7 +14,8 @@ from . views import (CourseSearching,
                     AddToCart,
                     Adtocart,  #adtocart for sample
                     Checkout,
-                    PaymentAPI) 
+                    PaymentAPI,
+                    LiveEnrollment) 
 
 urlpatterns = [
     path('searching/',CourseSearching.as_view(),name="course_searching"),
@@ -36,5 +37,7 @@ urlpatterns = [
     path('addtocart/<int:pk>/',Adtocart.as_view()),
 
     path('checkout/',Checkout.as_view(),name='checkout'),
-    path('make_payment/', PaymentAPI.as_view(), name='make_payment')
+    path('make_payment/', PaymentAPI.as_view(), name='make_payment'),
+
+    path('liveenroll/<int:pk>/',LiveEnrollment.as_view(),name="live_enrollment")
 ]

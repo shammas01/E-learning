@@ -40,7 +40,7 @@ class LiveClassDetailsModel(models.Model):
     class_duration = models.PositiveIntegerField(null=True,blank=True)  
     max_slots = models.PositiveIntegerField()  
     available_slots = models.PositiveIntegerField(null=True,blank=True)  
-    pricing = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True) 
+    pricing = models.PositiveIntegerField(null=True,blank=True) 
     session_status = models.CharField(max_length=12, default="Planned",choices=SESSION_STATUSES,null=True)  
     created_datetime = models.DateTimeField(auto_now_add=True)  
     last_updated_datetime = models.DateTimeField(auto_now=True)  
