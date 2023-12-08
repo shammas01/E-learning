@@ -34,7 +34,7 @@ urlpatterns = [
 
     path('showcart/',ShowCartView.as_view(),name="show_cart"),
     path('addtocart/',AddToCart.as_view(),name='add_to_cart'),
-    path('addtocart/<int:pk>/',Adtocart.as_view()),
+    path('addtocart2/<int:pk>/',Adtocart.as_view()),
 
     path('checkout/',Checkout.as_view(),name='checkout'),
     path('make_payment/', PaymentAPI.as_view(), name='make_payment'),

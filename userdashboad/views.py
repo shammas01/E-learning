@@ -1,3 +1,4 @@
+from datetime import timedelta, timezone
 import random,math
 from django.conf import settings
 from django.http import Http404
@@ -342,6 +343,8 @@ class Adtocart(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CartItemSerializer
 
+    serializer_class = CartItemSerializer
+    @extend_schema(responses=CartItemSerializer)
     def post(self, request, pk):    
         try:
             course = CourseDetailsModel.objects.get(id=pk)
@@ -369,6 +372,8 @@ import stripe
 class Checkout(APIView):
     permission_classes = [IsAuthenticated]
     
+    serializer_class = CartItemSerializer
+    @extend_schema(responses=CartItemSerializer)
     def post(self, request):
         user = request.user 
         cartitems = CartItem.objects.filter(cart__user=user)
@@ -389,8 +394,9 @@ from django.conf import settings
 
 class PaymentAPI(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = CardInformationSerializer
 
+    serializer_class = CardInformationSerializer
+    @extend_schema(responses=CardInformationSerializer)
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         response = {}
@@ -488,6 +494,7 @@ class PaymentAPI(APIView):
 
 from . serializer import LiveEnrollSerializer
 from . models import liveEnroll
+from . tasks import send_email_reminder
 class LiveEnrollment(APIView):
     permission_classes = [IsAuthenticated]
     def get_object(self,pk):
@@ -496,12 +503,16 @@ class LiveEnrollment(APIView):
         except LiveClassDetailsModel.DoesNotExist:
             raise Http404
 
+    serializer_class = LiveSelectSerializer
+    @extend_schema(responses=LiveSelectSerializer)
     def get(self,request,pk):
         data = self.get_object(pk)
         serializer = LiveSelectSerializer(data)
         return Response(serializer.data)
         
 
+    serializer_class = CardInformationSerializer
+    @extend_schema(responses=CardInformationSerializer)
     def post(self, request,pk):
         data = self.get_object(pk)
         live_enrollments = liveEnroll.objects.filter(
@@ -509,8 +520,11 @@ class LiveEnrollment(APIView):
         lives=data)
         if data.session_status != 'Published':
             return Response("enroll after publishing")
+        if data.available_slots <= 0:
+            return Response("slot is not available")
         if live_enrollments.exists():
             return Response('You have already enrolled in this live session')
+        
         
         response = {}
         serializer = CardInformationSerializer(data=request.data)
@@ -568,10 +582,15 @@ class LiveEnrollment(APIView):
                     "payment_intent": payment_intent_modified,
                     "payment_confirm": payment_confirm
                 }
+            # live_object.available_slots -= 1
+            # live_object.save()
+            
             add_live = liveEnroll.objects.create(
                 user = user,
                 lives = live_object
             )
+            print(add_live.lives.id)
+            send_email_reminder.apply_async(args=[add_live.lives.id],eta=add_live.lives.class_start_datetime - timedelta(minutes=5))
         else:
             response = {
                 'message': "Card Payment Failed",

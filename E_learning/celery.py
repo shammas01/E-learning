@@ -29,14 +29,15 @@ def debug_task(self):
 
 
 #celery beat settings
-app.conf.beat_schedule={
-    'send-mail-everyday-at-7':{
-        'task':'live.tasks.send_mail_func',
-        'schedule': crontab(hour=13,minute=39),
-        # we can pass arguments here and we can use those in
-        # firemailapp/tasks.py send_mail_func function for 
-        # that you need one extra argument in your function
-        # currently we are not doing that
-        # 'args': (1000,)  
+app.conf.beat_schedule = {
+    'send-mail-everyday-at-7': {
+        'task': 'live.tasks.send_mail_func',
+        'schedule': crontab(hour=7, minute=0),
+        
+    },
+    'send-reminder-everyday-at-7': {
+        'task': 'userdashboad.tasks.send_email_reminder',
+        'schedule': crontab(hour=17, minute=0), 
+        
     }
 }
