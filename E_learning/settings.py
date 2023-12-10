@@ -99,7 +99,7 @@ DATABASES = {
         "NAME": "e_learning_db",
         "USER": "postgres",
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": "localhost",
+        "HOST": "db", #if you want to change your server into "local server" change (HOST:"localhost")
         "PORT": 5432,
     }
 }
