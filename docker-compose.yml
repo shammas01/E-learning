@@ -1,0 +1,123 @@
+# version: '3.9'
+
+# services:
+#   db:
+#     image: postgres
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     environment:
+#       POSTGRES_DB: e_learning_db
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: sms2213
+
+#   web:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile  # Path to your Dockerfile
+#     command: python manage.py runserver 0.0.0.0:8000
+#     volumes:
+#       - .:/code  # Mount your project app folder
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - db  
+#       - redis  # new code start with this line
+#       - celery_worker
+#     environment:
+#       - REDIS_URL=redis://redis:6379/0
+#       - CELERY_BROKER_URL=redis://redis:6379/0
+#       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+#   redis:
+#   image: redis:latest
+#   ports:
+#     - "6379:6379"
+  
+#   celery_worker:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     command: celery -A E_learning worker --loglevel=info
+#     volumes:
+#       - .:/code
+#     depends_on:
+#       - redis
+  
+#   celery_beat:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     command: celery -A E_learning beat --loglevel=info
+#     volumes:
+#       - .:/code
+#     depends_on:
+#       - redis # celery configration end here
+
+# volumes:
+#   postgres_data:
+
+
+
+
+
+
+
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: e_learning_db_docker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py runserver 0.0.0.0:8000 & celery -A E_learning.celery worker --pool=solo -l INFO & celery -A E_learning beat --scheduler django_celery_beat.schedulers:DatabaseScheduler -l info"
+
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db  
+      - redis
+      - celery_worker
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DOCKERIZED=1
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+  
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A E_learning worker --loglevel=info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+  
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A E_learning beat --loglevel=info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:

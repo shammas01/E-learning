@@ -57,8 +57,8 @@ class RegisterEmailSendView(APIView):
 
 class EmailVerify(APIView):
 
-    serializer_class = LoginSerializer
-    @extend_schema(responses=LoginSerializer)
+    serializer_class = OtpSerializer
+    @extend_schema(responses=OtpSerializer)
     def post(self, request):
         otp = request.data.get('otp')
         saved_otp = request.session.get('otp')

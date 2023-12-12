@@ -590,7 +590,10 @@ class LiveEnrollment(APIView):
                 lives = live_object
             )
             print(add_live.lives.id)
-            send_email_reminder.apply_async(args=[add_live.lives.id],eta=add_live.lives.class_start_datetime - timedelta(minutes=5))
+            if add_live:
+                send_email_reminder.apply_async(args=[add_live.lives.id],eta=add_live.lives.class_start_datetime - timedelta(minutes=5))
+            else:
+                raise liveEnroll.DoesNotExist
         else:
             response = {
                 'message': "Card Payment Failed",

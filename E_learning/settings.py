@@ -93,17 +93,44 @@ WSGI_APPLICATION = "E_learning.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "e_learning_db",
-        "USER": "postgres",
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": "db", #if you want to change your server into "local server" change (HOST:"localhost")
-        "PORT": 5432,
-    }
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "e_learning_db",
+#         "USER": "postgres",
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+#         "HOST": "localhost", #if you want to change your server into "local server" change (HOST:"localhost") else : "db "
+#         "PORT": 5432,
+#     }
+# }
+
+
+local_settings = {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": "e_learning_db",
+    "USER": "postgres",
+    "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+    "HOST": "localhost",
+    "PORT": 5432,
 }
 
+# Check if running in a Docker environment
+if 'DOCKERIZED' in os.environ:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "e_learning_db_docker",
+            "USER": "postgres",
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"), 
+            "HOST": "db",
+            "PORT": 5432,
+        }
+    }
+    print(DATABASES)
+else:
+    DATABASES = {
+        "default": local_settings
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -126,10 +153,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = 'Asia/Kolkata'
 
 
 
@@ -234,9 +257,9 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -245,11 +268,16 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 
 # celery configration.............
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+# CELERY_BROKER_URL = 'redis://127.0.0.1:6379' #old
+# CELERY_RESULT_BACKEND = "django-db" #for storing celery results in our db
+
+CELERY_BROKER_URL = 'redis://redis:6379/0' #new................
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0' # new............
+
+
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 
-CELERY_RESULT_BACKEND = "django-db" #for storing celery results in our db
 CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler'
