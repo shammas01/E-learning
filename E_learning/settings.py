@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "debug_toolbar",
     "django_celery_results",
-    "django_celery_beat"
+    "django_celery_beat",
+    "channels",
 ]
 
 
@@ -281,3 +282,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 
 CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler'
+
+
+# channels configration..........
+ASGI_APPLICATION = "E_learning.asgi.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
