@@ -29,7 +29,7 @@ urlpatterns = [
     path("course/", include("course.urls")),
     path("live/",include("live.urls")),
     path("user/",include("userdashboad.urls")),
-    path("chat/",include("chat.urls")),
+    path("",include("chat.urls")),
 
     
     # for swagger documatetion

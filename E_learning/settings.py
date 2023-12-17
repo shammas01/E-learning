@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "course",
     "live",
     "userdashboad",
+    "chat",
 
     "rest_framework",
     "rest_framework_simplejwt",
@@ -89,6 +90,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "E_learning.wsgi.application"
+ASGI_APPLICATION = "E_learning.asgi.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -285,13 +296,5 @@ CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler'
 
 
 # channels configration..........
-ASGI_APPLICATION = "E_learning.asgi.application"
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-        },
-    },
-}
+

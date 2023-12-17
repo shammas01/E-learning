@@ -15,7 +15,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 import chat.routing
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "E_learning.settings")
-application = get_asgi_application()
+
 
 # channel configration....... 
 application = ProtocolTypeRouter({
@@ -26,3 +26,4 @@ application = ProtocolTypeRouter({
     )
   )
 })
+

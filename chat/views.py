@@ -1,6 +1,7 @@
 import json
 from django.shortcuts import render
-
+from .models import Message
+from django.http import HttpResponse
 # Create your views here.
 
 def index(request):
@@ -8,8 +9,11 @@ def index(request):
 
 
 def room(request, room_name):
-  username = request.GET.get('username', 'Anonymous')
-  return render(request, 'room.html', {'room_name': room_name, 'username': username})
+    username = request.GET.get('username', 'Anonymous')
+#   messages = Message.objects.filter(room=room_name)[0:25]
+   
+    return render(request, 'room.html', {'room_name': room_name, 'username': username})
+  
 
 
 
@@ -31,13 +35,3 @@ async def receive(self, text_data):
   )
 
 
-# Receive message from room group
-async def chat_message(self, event):
-  message = event['message']
-  username = event['username']
-
-  # Send message to WebSocket
-  await self.send(text_data=json.dumps({
-    'message': message,
-    'username': username
-  }))
