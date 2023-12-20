@@ -13,9 +13,9 @@
             <form class="dis-col gap-10 algn-cent just-cent" id="register-form" method="post" action="">
                 <span class="sign-in-text text-color">Sign In</span>
                 {% csrf_token %}
-                <input id="email" class="main-background text-color" type="text"
+                <input id="username" name="username" class="main-background text-color" type="text"
                        placeholder="Enter email">
-                <input id="password" class="main-background text-color" type="password"
+                <input id="password" name="password" class="main-background text-color" type="password"
                        placeholder="Enter Password">
                 <div id="error" class="error-message danger-text"></div>
                 <button type="submit" id="submit-button" class="accent-two-bg text-color card full-width">Login</button>

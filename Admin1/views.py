@@ -3,22 +3,23 @@ from rest_framework.views import APIView
 from live.models import LiveClassDetailsModel
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.http import JsonResponse, HttpRequest
+from django.http import Http404, JsonResponse, HttpRequest
 from rest_framework.response import Response
 from django.urls import reverse
 from rest_framework import status
 from . helper import superuser_login_required
+from useraccount.models import User
 # Create your views here.
 
     
 
 def admin_login(request):
-    # if request.user.is_authenticated and request.user.is_admin:
-    #     return redirect('admin_home')
+    if request.user.is_authenticated and request.user.is_admin:
+        return redirect('admin_home')
     
     if request.method == 'POST':
         try:
-            username = request.POST['username']
+            email = request.POST['username']
             password = request.POST['password']
             
         except KeyError:
@@ -29,14 +30,19 @@ def admin_login(request):
             )
             response.status_code = 400
             return response
+        print(f"Received username: {email}, password: {password}")
+
+        user = authenticate(email=email, password=password)
+
         
-        user = authenticate(request, username=username, password=password)
+        
+        print(user)
         if (user is not None) and user.is_admin:
             login(request, user)
             return JsonResponse(
                 data={
                     'success': 'Logged in successfully',
-                    # 'redirect': reverse('admin_home')
+                    'redirect': reverse('admin_home')
                 }
             )
         else:
@@ -51,12 +57,13 @@ def admin_login(request):
 
 
 
+
 @superuser_login_required(login_url='admin_login')
 def admin_home(request):
     analytics = [
         {
             'title': 'No. of Users',
-            'value': User.admin_objects.all().count()
+            'value': User.objects.all().count()
         },
         # {
         #     'title': 'No. of Posts',
@@ -75,4 +82,12 @@ def admin_home(request):
     data = {
         'analytics': analytics
     }
-    return render(request, 'admin-home.html', context=data)
+    return render(request, 'admin_home.html', context=data)
+
+
+@superuser_login_required(login_url='admin_login')
+def admin_logout(request: HttpRequest):
+    logout(request)
+    return redirect(
+        to='admin_login'
+    )
