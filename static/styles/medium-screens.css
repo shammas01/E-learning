@@ -1,0 +1,66 @@
+.left-bar-elements label{
+    display: none;
+}
+
+.left-bar-elements{
+    padding: 10px;
+}
+
+.left-bar-logo{
+    display: none;
+}
+
+.left-bar{
+    min-width: fit-content;
+}
+
+.left-bar-except-root{
+    width: 100%;
+    max-width: 100%;
+    margin-left: 40px;
+    display: flex;
+    padding: 30px;
+    box-sizing: border-box;
+    justify-content: space-between;
+}
+
+.right-bar {
+    min-width: 250px;
+}
+
+.posts-area{
+    max-width: 440px;
+    width: 100%;
+}
+
+.page-divider {
+    flex-direction: row;
+    height: 100vh;
+}
+
+.saved-post-width {
+    width: 100%;
+}
+
+.users-list {
+    grid-template-columns: 1fr 1fr;
+}
+
+.admin-user-data {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: auto;
+}
+
+.hide-chat-side{
+    display: none;
+}
+
+.chat-side-bar{
+    width: 100%;
+}
+
+#chat-search-box input{
+    width: 100%;
+}
