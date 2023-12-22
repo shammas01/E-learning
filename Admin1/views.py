@@ -9,6 +9,9 @@ from django.urls import reverse
 from rest_framework import status
 from . helper import superuser_login_required
 from useraccount.models import User
+from tutor.models import TutorModel
+from course.models import CourseDetailsModel
+from live.models import LiveClassDetailsModel
 # Create your views here.
 
     
@@ -65,19 +68,19 @@ def admin_home(request):
             'title': 'No. of Users',
             'value': User.objects.all().count()
         },
-        # {
-        #     'title': 'No. of Posts',
-        #     'value': Post.admin_objects.all().count()
-        # },
-        # {
-        #     'title': 'No. of Reports',
-        #     'value': Report.objects.all().count()
-        # },
+        {
+            'title': 'No. of Tutors',
+            'value': TutorModel.objects.filter(approved=True).count()
+        },
+        {
+            'title': 'No. of Course',
+            'value': CourseDetailsModel.objects.all().count()
+        },
         
-        # {
-        #     'title': 'No. of Comments',
-        #     'value': Comment.admin_objects.all().count()
-        # }
+        {
+            'title': 'No. of Live sessinos',
+            'value': LiveClassDetailsModel.objects.all().count()
+        }
     ]
     data = {
         'analytics': analytics
