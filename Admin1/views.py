@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework.views import APIView
 from live.models import LiveClassDetailsModel
 from django.shortcuts import render, redirect
@@ -40,14 +40,15 @@ def admin_login(request):
         
         
         print(user)
-        if (user is not None) and user.is_admin:
+        if (user is not None) and user.is_admin is True:
             login(request, user)
-            return JsonResponse(
-                data={
-                    'success': 'Logged in successfully',
-                    'redirect': reverse('admin_home')
-                }
-            )
+            return redirect('admin_home')
+            # return JsonResponse(
+            #     data={
+            #         'success': 'Logged in successfully',
+            #         'redirect': redirect('admin_home')
+            #     }
+            # )
         else:
             response = JsonResponse(
                 data={
@@ -93,4 +94,27 @@ def admin_logout(request: HttpRequest):
     logout(request)
     return redirect(
         to='admin_login'
+    )
+
+
+
+def AdminUserDetails(request):
+    users = User.objects.filter(is_admin=True).order_by('-date_joined')
+    data = {'users': users}
+    return render(request, 'admin_user.html', context=data)
+        
+
+
+@superuser_login_required(login_url='admin_login')
+def admin_profile_pages(request, username):
+    user = get_object_or_404(User.objects, username=username)
+    context = {
+        'user': user,
+        'admin_data': True,
+        'posts': True,
+    }
+    return render(
+        request=request,
+        template_name='admin_profile_page.html',
+        context=context,
     )

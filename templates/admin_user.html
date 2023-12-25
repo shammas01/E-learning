@@ -1,0 +1,17 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="width-max padding-20 dis-col">
+    <h1 class="text-color">Users</h1>
+    <div class="users-list">
+        {% for user in users %}
+        <div class="secondary-background padding-10 card">
+            {% include 'admin_user_small_data.html' with user=user %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
