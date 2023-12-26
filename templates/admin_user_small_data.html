@@ -1,7 +1,7 @@
 <a href="{% url 'admin_profile_page' username=user.username %}">
     <div class="dis-row gap-10">
         <div class="small-avatar">
-            <img class="avatar" src="{{ user.profile_picture }}" alt="Avatar">
+            <img class="avatar" src="{{ user.profile_picture.url }}" alt="Avatar">
         </div>
         <div class="dis-col just-cent">
             <div class="fullname text-color">{{ user.email }}</div>

@@ -31,11 +31,13 @@ class RegisterEmailSendView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data.get("email")
             password = serializer.validated_data.get('password')
+            username = serializer.validated_data.get('username')
             
 
             User.objects.create_user(
                 email = email,
                 password = password,
+                username = username
             )
 
             otp = math.floor((random.randint(100000, 999999)))

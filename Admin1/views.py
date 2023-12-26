@@ -98,17 +98,15 @@ def admin_logout(request: HttpRequest):
 
 
 
-def AdminUserDetails(request):
-    users = User.objects.filter(is_admin=True).order_by('-date_joined')
-    data = {'users': users}
-    return render(request, 'admin_user.html', context=data)
+
+
         
 
 
 @superuser_login_required(login_url='admin_login')
 def admin_profile_pages(request, username):
     user = get_object_or_404(User.objects, username=username)
-    context = {
+    data = {
         'user': user,
         'admin_data': True,
         'posts': True,
@@ -116,5 +114,39 @@ def admin_profile_pages(request, username):
     return render(
         request=request,
         template_name='admin_profile_page.html',
-        context=context,
+        context=data,
+    )
+
+
+@superuser_login_required(login_url='admin_login')
+def AdminUserDetails(request):
+    # users = User.objects.filter(is_admin=True).order_by('-date_joined')
+    users = User.objects.all().order_by('-date_joined')
+    data = {'users': users}
+    return render(request, 'admin_user.html', context=data)
+
+
+
+
+
+@superuser_login_required(login_url='admin_login')
+def admin_tutor_listing(request):
+    tutors = TutorModel.objects.all()
+    aptutors = TutorModel.objects.filter(approved=True)
+
+    data = {'tutors':tutors,'aptutors':aptutors}
+    print(data)
+    return render(request, 'admin_tutors.html',context=data)
+
+
+
+def TutorProfile(request,name):
+    tutor = get_object_or_404(TutorModel.objects, name=name)
+    data = {
+        'tutor': tutor,
+    }
+    return render(
+        request=request,
+        template_name='admin_tutor_profile.html',
+        context=data,
     )

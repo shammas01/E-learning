@@ -1,0 +1,16 @@
+<a href="{% url 'tutor_profile' name=tutor.name %}">
+    <div class="dis-row gap-10">
+        <div class="small-avatar">
+
+            <img class="avatar" src="{{ tutor.profile_picture.url }}" alt="Avatar">
+        </div>
+        <div class="dis-col just-cent">
+            
+            <div class="fullname text-color">{{ tutor.user }}</div>
+            {% if tutor.name %}
+            <div class="location">@{{ tutor.name }}</div>
+            {% endif %}
+            
+        </div>
+    </div>
+</a>

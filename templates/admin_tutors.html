@@ -1,0 +1,27 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Tutors{% endblock %}
+
+{% block content %}
+<div class="width-max padding-20 dis-col">
+    <h1 class="text-color">All Tutors</h1>
+    <div class="users-list">
+        {% for tutor in tutors %}
+        <div class="secondary-background padding-10 card">
+            {% include 'admin_tutor_small_data.html' with tutor=tutor %}
+        </div>
+        {% endfor %}
+    </div>
+
+     <div>
+        <h1 class="text-color">Approved Tutors</h1>
+        {% for tutor in aptutors %}
+        <div class="secondary-background padding-10 card">
+            {% include 'admin_tutor_small_data.html' with tutor=tutor %}
+        </div>
+        {% endfor %}
+    </div>  
+    
+</div>
+{% endblock %}
