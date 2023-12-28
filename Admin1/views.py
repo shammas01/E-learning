@@ -100,16 +100,23 @@ def admin_logout(request: HttpRequest):
 
 
 
-        
+
+@superuser_login_required(login_url='admin_login')
+def Admin_User_listing(request):
+    # users = User.objects.filter(is_admin=True).order_by('-date_joined')
+    users = User.objects.all().order_by('-date_joined')
+    data = {'users': users}
+    return render(request, 'admin_user.html', context=data)
 
 
 @superuser_login_required(login_url='admin_login')
-def admin_profile_pages(request, username):
-    user = get_object_or_404(User.objects, username=username)
+def User_profile(request, pk):
+    user = get_object_or_404(User.objects, id=pk)
+    
     data = {
         'user': user,
-        'admin_data': True,
-        'posts': True,
+        
+        
     }
     return render(
         request=request,
@@ -118,33 +125,27 @@ def admin_profile_pages(request, username):
     )
 
 
-@superuser_login_required(login_url='admin_login')
-def AdminUserDetails(request):
-    # users = User.objects.filter(is_admin=True).order_by('-date_joined')
-    users = User.objects.all().order_by('-date_joined')
-    data = {'users': users}
-    return render(request, 'admin_user.html', context=data)
-
-
-
 
 
 @superuser_login_required(login_url='admin_login')
-def admin_tutor_listing(request):
+def Admin_tutor_listing(request):
     tutors = TutorModel.objects.all()
     aptutors = TutorModel.objects.filter(approved=True)
+    notaptutors = TutorModel.objects.filter(approved=False)
 
-    data = {'tutors':tutors,'aptutors':aptutors}
-    print(data)
+    data = {'tutors':tutors,'aptutors':aptutors,'notaptutors':notaptutors}
+    
     return render(request, 'admin_tutors.html',context=data)
 
 
 
-def TutorProfile(request,name):
-    tutor = get_object_or_404(TutorModel.objects, name=name)
+def Tutor_Profile(request,pk):
+    tutor = get_object_or_404(TutorModel.objects, id=pk)
+    print(tutor.pk)
     data = {
         'tutor': tutor,
     }
+    print(data)
     return render(
         request=request,
         template_name='admin_tutor_profile.html',

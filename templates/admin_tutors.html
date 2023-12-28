@@ -22,6 +22,15 @@
         </div>
         {% endfor %}
     </div>  
+
+    <div>
+        <h1 class="text-color">Withing list</h1>
+        {% for tutor in notaptutors %}
+        <div class="secondary-background padding-10 card">
+            {% include 'admin_tutor_small_data.html' with tutor=tutor %}
+        </div>
+        {% endfor %}
+    </div>  
     
 </div>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends 'admin_base.html' %}
 {% load static %}
 
-{% block title %}{{ user.username }} | Skull UP lab{% endblock %}
+{% block title %}{{ tutor.name }} | Skull UP lab{% endblock %}
 
 {% block content %}
     <div class="width-max admin-user-data gap-10">
@@ -35,7 +35,7 @@
                     <path d="M8.06006 20.72H15.9401" stroke="#F2F2F2" stroke-width="1.5" stroke-linecap="round"
                           stroke-linejoin="round"></path>
                 </svg>
-                <span>{% if user.fullname %}{{ user.fullname }}{% else %}Fullname not available{% endif %}</span>
+                <span>{% if tutor.fullname %}{{ tutor.fullname }}{% else %}Fullname not available{% endif %}</span>
             </div>
 
             <div class="dis-row gap-10">
@@ -77,7 +77,7 @@
                     <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
                           stroke="#F2F2F2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
-                <span>@{{ user.username }}</span>
+                <span>@{{ tutor.name }}</span>
             </div>
 
             <div class="dis-row gap-10">
@@ -104,7 +104,12 @@
                     <path d="M8.29431 16.7H8.30329" stroke="#F2F2F2" stroke-width="2" stroke-linecap="round"
                           stroke-linejoin="round"></path>
                 </svg>
-                <span>Joined on {{ user.date_joined }}</span>
+                <span>
+                    Skills:
+                    {%for sk in tutor.skills.all %}
+                    {{ sk }}
+                    {%endfor%}
+                </span>
             </div>
 
             <div class="dis-row gap-10">
@@ -118,7 +123,7 @@
                     <path d="M18.3401 20C19.0601 19.85 19.7401 19.56 20.3001 19.13C21.8601 17.96 21.8601 16.03 20.3001 14.86C19.7501 14.44 19.0801 14.16 18.3701 14"
                           stroke="#F2F2F2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
-                <span>{{ user.number_of_followers }} Followers</span>
+                <span>{{ user.number_of_followers }} Follower</span>
             </div>
 
             <div class="dis-row gap-10">

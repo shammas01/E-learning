@@ -23,7 +23,7 @@
                 {% include 'admin_profile_menu_options.html' with id='menu' username=user.username banned=user.banned %}
             </div>
             <div class="large-avatar">
-                <img class="avatar" src="{{ user.profile_picture }}" alt="profile-picture of @{{ user.username }}">
+                <img class="avatar" src="{{ user.profile_picture.url }}" alt="profile-picture of @{{ user.username }}">
             </div>
 
             <div class="dis-row gap-10">

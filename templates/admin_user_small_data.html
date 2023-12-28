@@ -1,4 +1,4 @@
-<a href="{% url 'admin_profile_page' username=user.username %}">
+<a href="{% url 'admin_profile_page' pk=user.pk %}">
     <div class="dis-row gap-10">
         <div class="small-avatar">
             <img class="avatar" src="{{ user.profile_picture.url }}" alt="Avatar">
