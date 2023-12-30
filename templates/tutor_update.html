@@ -1,0 +1,21 @@
+<!-- tutor_update.html -->
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block title %}Update Tutor{% endblock %}
+
+{% block content %}
+    <div class="tutor-details">
+        <img class="avatar" src="{{ tutor.profile_picture.url }}" alt="Avatar">
+        <div class="details">
+            <h1>{{ tutor.user }}</h1>
+            {% if tutor.name %}
+                <p>@{{ tutor.name }}</p>
+            {% endif %}
+            <p>Approval Status: {% if tutor.approved %}Approved{% else %}Pending Approval{% endif %}</p>
+        </div>
+        <form method="POST" action="{% url 'approve_tutor' pk=tutor.pk %}">
+            {% csrf_token %}
+            <input type="submit" value="Approve Tutor">
+        </form>
+    </div>
+{% endblock %}

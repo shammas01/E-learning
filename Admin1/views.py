@@ -141,13 +141,22 @@ def Admin_tutor_listing(request):
 
 def Tutor_Profile(request,pk):
     tutor = get_object_or_404(TutorModel.objects, id=pk)
-    print(tutor.pk)
     data = {
         'tutor': tutor,
     }
-    print(data)
-    return render(
-        request=request,
-        template_name='admin_tutor_profile.html',
-        context=data,
-    )
+    if tutor.approved == False:
+        return render(
+                      request=request,
+                      template_name="tutor_update.html",
+                      context=data
+                      )
+    else:
+        return render(
+            request=request,
+            template_name='admin_tutor_profile.html',
+            context=data,
+        )
+
+
+def tutorapprovel(request):
+    pass

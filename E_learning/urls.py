@@ -23,14 +23,14 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path("",include("chat.urls")),
+    path("chat/",include("chat.urls")), #NOTHING updated (30-12-2023)
     path("admin/", admin.site.urls),
     path("reg/", include("useraccount.urls")),
     path("tutor/", include("tutor.urls")),
     path("course/", include("course.urls")),
     path("live/",include("live.urls")),
     path("user/",include("userdashboad.urls")),
-    path('admin1/',include("Admin1.urls")),
+    path('',include("Admin1.urls")),
 
     
     # for swagger documatetion
