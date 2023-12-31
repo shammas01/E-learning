@@ -30,7 +30,7 @@ urlpatterns = [
     path("course/", include("course.urls")),
     path("live/",include("live.urls")),
     path("user/",include("userdashboad.urls")),
-    path('',include("Admin1.urls")),
+    path("",include("Admin1.urls")),
 
     
     # for swagger documatetion

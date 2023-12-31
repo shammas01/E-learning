@@ -1,21 +1,95 @@
-<!-- tutor_update.html -->
 {% extends 'admin_base.html' %}
 {% load static %}
-{% block title %}Update Tutor{% endblock %}
+{% block title %}Tutor Profile{% endblock %}
 
 {% block content %}
-    <div class="tutor-details">
-        <img class="avatar" src="{{ tutor.profile_picture.url }}" alt="Avatar">
-        <div class="details">
-            <h1>{{ tutor.user }}</h1>
-            {% if tutor.name %}
-                <p>@{{ tutor.name }}</p>
-            {% endif %}
-            <p>Approval Status: {% if tutor.approved %}Approved{% else %}Pending Approval{% endif %}</p>
-        </div>
-        <form method="POST" action="{% url 'approve_tutor' pk=tutor.pk %}">
-            {% csrf_token %}
-            <input type="submit" value="Approve Tutor">
-        </form>
+<div class="container" style="color: white;">
+  <div class="tutor-profile">
+    <div class="tutor-info">
+      <img class="avatar" style="width:150px;height:150px" src="{{ tutor.profile_picture.url }}" alt="Avatar">
+      <div class="tutor-details">
+        <h2 class="tutor-name">{{ tutor.user }}</h2>
+        <p class="tutor-location">@{{ tutor.name }}</p>
+        <p class="tutor-approval">Approval Status: {{ tutor.approved }}</p>
+      </div>
+    </div >
+
+    <div class="tutor-resume">
+        <h3>Resume 👇</h3>
+        {% if tutor.resume %}
+        <object data="{{ tutor.resume.url }}" type="application/pdf" width="800" height="600">
+          <p> Click <a style="color: red;" href="{{ tutor.resume.url }}">here</a> to download. or read</p>
+        </object>
+        {% else %}
+        <p> This Tutor is not uploaded </p>
+        {% endif %}
+      </div>
+
+    <div class="tutor-skills">
+      <h3>Skills</h3>
+      <ul>
+        {% for skill in tutor.skills.all %}
+        <li>{{ skill }}</li>
+        {% endfor %}
+      </ul>
     </div>
+
+  <div>
+    <div class="approval-actions">
+      <form method="post" action="{% url 'approve_tutor' pk=tutor.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Approve Tutor</button>
+      </form>
+    </div>
+    <br>
+
+    <div class="block-actions">
+      <form method="post" action="{% url 'block_tutor' pk=tutor.pk %}">
+        {% csrf_token %}
+        {% if tutor.is_block %}
+        <button type="submit" class="btn btn-success">Unblock Tutor</button>
+        {% else %}
+        <button type="submit" class="btn btn-danger">Block Tutor</button>
+        {% endif %}
+      </form>
+    </div>
+
+  </div>
+
+  </div>
+</div>
+
+<style>
+    /* Add this CSS to your stylesheet or within a <style> tag */
+
+    /* Default button styles */
+    .approval-actions form button {
+        background-color: #28a745; /* Default button color */
+        color: white; /* Button text color */
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s, transform 0.3s;
+    }
+
+    /* Hover effect */
+    .approval-actions form button:hover {
+        background-color: #218838; /* New button color on hover */
+        color: #f8f9fa; /* New button text color on hover */
+        transform: scale(1.05); /* Optional: Slightly increase button size on hover */
+    }
+
+
+
+
+    .block-actions form button {
+      background-color: #FF0000;/* Default button color */
+      color: white; /* Button text color */
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s, transform 0.3s;
+  }
+
+</style>
 {% endblock %}

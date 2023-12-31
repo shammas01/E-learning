@@ -138,7 +138,7 @@ def Admin_tutor_listing(request):
     return render(request, 'admin_tutors.html',context=data)
 
 
-
+@superuser_login_required(login_url='admin_login')
 def Tutor_Profile(request,pk):
     tutor = get_object_or_404(TutorModel.objects, id=pk)
     data = {
@@ -157,6 +157,17 @@ def Tutor_Profile(request,pk):
             context=data,
         )
 
+@superuser_login_required(login_url='admin_login')
+def approve_tutor(request, pk):
+    tutor = get_object_or_404(TutorModel.objects, id=pk)
+    tutor.approved = True
+    tutor.save()
+    return redirect('tutor_profile', pk=pk)
 
-def tutorapprovel(request):
-    pass
+
+@superuser_login_required(login_url='admin_login')
+def block_tutor(reqeust, pk):
+    tutor = get_object_or_404(TutorModel.objects, id=pk)
+    tutor.is_block = not tutor.is_block
+    tutor.save()
+    return redirect('tutor_profile', pk=pk)
