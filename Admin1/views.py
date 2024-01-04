@@ -105,7 +105,8 @@ def admin_logout(request: HttpRequest):
 def Admin_User_listing(request):
     # users = User.objects.filter(is_admin=True).order_by('-date_joined')
     users = User.objects.all().order_by('-date_joined')
-    data = {'users': users}
+    admins = User.objects.filter(is_admin=True)
+    data = {'users': users,'admins': admins}
     return render(request, 'admin_user.html', context=data)
 
 
@@ -166,7 +167,7 @@ def approve_tutor(request, pk):
 
 
 @superuser_login_required(login_url='admin_login')
-def block_tutor(reqeust, pk):
+def block_unblock_tutor(reqeust, pk):
     tutor = get_object_or_404(TutorModel.objects, id=pk)
     tutor.is_block = not tutor.is_block
     tutor.save()

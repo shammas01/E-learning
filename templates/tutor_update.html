@@ -21,7 +21,7 @@
           <p> Click <a style="color: red;" href="{{ tutor.resume.url }}">here</a> to download. or read</p>
         </object>
         {% else %}
-        <p> This Tutor is not uploaded </p>
+        <p> This Tutor is not uploaded CV</p>
         {% endif %}
       </div>
 
@@ -47,9 +47,9 @@
       <form method="post" action="{% url 'block_tutor' pk=tutor.pk %}">
         {% csrf_token %}
         {% if tutor.is_block %}
-        <button type="submit" class="btn btn-success">Unblock Tutor</button>
+        <button type="submit" class="btn btn-success"style="background-color:yellow;cursor: pointer;">Unblock Tutor</button>
         {% else %}
-        <button type="submit" class="btn btn-danger">Block Tutor</button>
+        <button type="submit" class="btn btn-danger" style="background-color:red; cursor: pointer;">Block Tutor</button>
         {% endif %}
       </form>
     </div>
@@ -79,17 +79,6 @@
         transform: scale(1.05); /* Optional: Slightly increase button size on hover */
     }
 
-
-
-
-    .block-actions form button {
-      background-color: #FF0000;/* Default button color */
-      color: white; /* Button text color */
-      border: none;
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: background-color 0.3s, color 0.3s, transform 0.3s;
-  }
 
 </style>
 {% endblock %}
