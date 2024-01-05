@@ -12,6 +12,7 @@ from useraccount.models import User
 from tutor.models import TutorModel
 from course.models import CourseDetailsModel
 from live.models import LiveClassDetailsModel
+from Admin1.authentication.smtp import send_email_for_tutor_approvel
 # Create your views here.
 
     
@@ -158,10 +159,22 @@ def Tutor_Profile(request,pk):
             context=data,
         )
 
+
 @superuser_login_required(login_url='admin_login')
 def approve_tutor(request, pk):
     tutor = get_object_or_404(TutorModel.objects, id=pk)
+    print(tutor)
+    print("><M><><><><><><",tutor.user)
     tutor.approved = True
+    subject = "Tutor Registration Completed"
+    message = "you have successfully approved"
+    message += "you can add your Course and live in your profile"
+
+    send_email_for_tutor_approvel(
+        subject=subject,
+        message=message,
+        email=tutor
+    )
     tutor.save()
     return redirect('tutor_profile', pk=pk)
 

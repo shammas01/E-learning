@@ -34,3 +34,6 @@ def send_email_live_confierm(user=None, email=None, message=None, subject=None):
 
     send_mail = EmailMessage(mail_subject, message, email, to=[to_email])
     send_mail.send()
+
+
+
