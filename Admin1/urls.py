@@ -7,7 +7,8 @@ from . views import (admin_login,
                      Admin_tutor_listing,
                      Tutor_Profile,
                      approve_tutor,
-                     block_unblock_tutor)
+                     block_unblock_tutor,
+                     tutor_couse_details)
 from django.contrib.auth.models import UserManager
 
 
@@ -23,6 +24,6 @@ urlpatterns = [
     path('user/<str:pk>/',User_profile,name='admin_profile_page'),
     path('tutors/<int:pk>/approve/', approve_tutor, name='approve_tutor'),
     path('tutor/<int:pk>/block/', block_unblock_tutor, name='block_tutor'),
-
+    path('course_details/<int:pk>/',tutor_couse_details,name='tutor_course'),
 
 ]

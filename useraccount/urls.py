@@ -4,6 +4,7 @@ from .views import (
     loginView,
     GoogleSocialAuthView,
     EmailVerify,
+    Register #for sample
 )
 
 urlpatterns = [
@@ -11,4 +12,6 @@ urlpatterns = [
     path('emailverify/',EmailVerify.as_view()),
     path("login/", loginView.as_view(), name="otp_verifiy"),
     path("googleaut/", GoogleSocialAuthView.as_view(), name="googelauth"),
+
+    path('samplereg/', Register.as_view(), name="samplereg")
 ]

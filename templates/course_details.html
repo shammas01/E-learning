@@ -1,0 +1,13 @@
+<a href="{% url 'tutor_course' pk=live.pk %}">
+    <div class="dis-row gap-10">
+        
+        <div class="dis-col just-cent">
+            
+            <div class="fullname text-color">{{ live.heading }}</div>
+            {% if live.price %}
+            <div class="location">@{{ live.price }}</div>
+            {% endif %}
+            
+        </div>
+    </div>
+</a>

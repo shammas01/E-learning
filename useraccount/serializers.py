@@ -28,7 +28,7 @@ class OtpSerializer(serializers.Serializer):
     def validate(self, attrs):
         otp = attrs.get('otp')
         if len(otp)<=4:
-            raise serializers.ValidationError("password must contain atleast 5 characters")
+            raise serializers.ValidationError("OTP must contain atleast 5 characters")
         return attrs
     
 
@@ -40,6 +40,7 @@ class PhoneOtpSerializer(serializers.Serializer):
         if len(phone_number)<=9:
             raise serializers.ValidationError("phone number invalid")
         return attrs
+
 
 class GoogleSocialAuthSerializer(serializers.Serializer):
     auth_token = serializers.CharField()

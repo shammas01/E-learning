@@ -23,6 +23,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ("phone", "first_name", "last_name", "address", "user")
 
     def update(self, instance, validated_data):
+        instance.phone = validated_data.get("phone", instance.first_name)
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.address = validated_data.get("address", instance.address)

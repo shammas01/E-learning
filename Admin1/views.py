@@ -36,11 +36,9 @@ def admin_login(request):
             return response
         print(f"Received username: {email}, password: {password}")
 
-        user = authenticate(email=email, password=password)
+        user = authenticate(request, username=email, password=password)
 
-        
-        
-        print(user)
+        print(f"Authenticated user: {user}")
         if (user is not None) and user.is_admin is True:
             login(request, user)
             return redirect('admin_home')
@@ -143,8 +141,10 @@ def Admin_tutor_listing(request):
 @superuser_login_required(login_url='admin_login')
 def Tutor_Profile(request,pk):
     tutor = get_object_or_404(TutorModel.objects, id=pk)
+    lives = CourseDetailsModel.objects.filter(tutor=tutor)
     data = {
         'tutor': tutor,
+        'lives':lives
     }
     if tutor.approved == False:
         return render(
@@ -185,3 +185,16 @@ def block_unblock_tutor(reqeust, pk):
     tutor.is_block = not tutor.is_block
     tutor.save()
     return redirect('tutor_profile', pk=pk)
+
+
+def tutor_couse_details(request,pk):
+    course = get_object_or_404(CourseDetailsModel.objects, id=pk)
+    data = {
+        'couse':course,
+    }
+    return render(
+        request=request,
+        template_name='course_details.html',
+        context=data
+        )
+    

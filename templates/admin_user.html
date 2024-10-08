@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="width-max padding-20 dis-col">
+
     <h1 class="text-color">All Users</h1>
     <div class="users-list">
         {% for user in users %}
@@ -13,6 +14,7 @@
         </div>
         {% endfor %}
     </div>
+
     <h1 class="text-color">Admins</h1>
     <div class="users-list">
         {% for user in admins %}
@@ -21,5 +23,6 @@
         </div>
         {% endfor %}
     </div>
+    
 </div>
 {% endblock %}

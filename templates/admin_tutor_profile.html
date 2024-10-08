@@ -4,15 +4,28 @@
 {% block title %}{{ tutor.name }} | Skull UP lab{% endblock %}
 
 {% block content %}
-    <div class="width-max admin-user-data gap-10">
+      <div class="width-max admin-user-data gap-10">
+
+
+        <div class="posts-area gap-20 dis-col">
+            <h1 class="text-color">Cources</h1>
+            <div class="gap-20 dis-col text-color">
+                {% for live in lives %}
+                  <div class="secondary-background padding-10 card">
+                  {% include 'course_details.html' with live=live %}
+                  </div>
+                {% endfor %}
+            </div>
+        </div>
       
         <div class="posts-area gap-20 dis-col">
             <div class="gap-20 dis-col">
-                {% for post in user.posts %}
+                {% for post in tutor.posts %}
                     {% comment %} {% include 'admin-post.html' %} {% endcomment %}
                 {% endfor %}
             </div>
         </div>
+
         <section class="position-rel dis-col padding-10 gap-10 secondary-background card text-color"
                  style="height: fit-content">
             <div class="less-action-button-corner menu-toggle" for="#menu">
@@ -150,7 +163,7 @@
                     <path d="M11.9945 16H12.0035" stroke="#F2F2F2" stroke-width="2" stroke-linecap="round"
                           stroke-linejoin="round"></path>
                 </svg>
-                <span>Is banned: {% if user.banned %}Yes{% else %}No{% endif %}</span>
+                <span>Is Blocked: {% if tutor.is_block %}Yes{% else %}No{% endif %}</span>
             </div>
 
             <div class="block-actions">
@@ -165,7 +178,7 @@
             </div>
 
         </section>
-    </div>
+      </div>
 {% endblock %}
 
 
